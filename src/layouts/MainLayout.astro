@@ -1,0 +1,157 @@
+---
+interface Props {
+  title: string;
+  namespace: string;
+}
+
+const { title, namespace } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <link rel="stylesheet" href="/src/styles/global.css">
+</head>
+<body class="bg-black text-white font-sans antialiased">
+  <div data-barba="wrapper">
+    <!-- Navigation persistante -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+            Portfolio
+          </a>
+          <ul class="flex gap-8">
+            <li>
+              <a 
+                href="/" 
+                class="hover:text-purple-400 transition-colors duration-300"
+                data-astro-reload
+              >
+                Accueil
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/projects" 
+                class="hover:text-purple-400 transition-colors duration-300"
+                data-astro-reload
+              >
+                Projets
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Container Barba pour le contenu des pages -->
+    <main data-barba="container" data-barba-namespace={namespace}>
+      <slot />
+    </main>
+  </div>
+
+  <script>
+    import barba from '@barba/core';
+    import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Fonction pour initialiser les animations de la page
+    function initPageAnimations() {
+      // Exemple d'animation au scroll
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }
+
+    // Initialisation Barba.js
+    barba.init({
+      transitions: [
+        {
+          name: 'overlay-transition',
+          
+          // Hook avant de quitter la page
+          leave(data) {
+            // IMPORTANT: Nettoyer tous les ScrollTriggers pour éviter les fuites mémoire
+            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            
+            // Animation de sortie avec overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-gradient-to-br from-purple-600 to-pink-600 z-[100]';
+            overlay.style.transformOrigin = 'left';
+            document.body.appendChild(overlay);
+
+            return gsap.fromTo(
+              overlay,
+              { scaleX: 0 },
+              {
+                scaleX: 1,
+                duration: 0.5,
+                ease: 'power2.inOut',
+              }
+            );
+          },
+
+          // Hook après l'entrée sur la nouvelle page
+          afterEnter(data) {
+            const overlay = document.querySelector('.fixed.inset-0.bg-gradient-to-br');
+            
+            // Animation d'entrée
+            return gsap.to(overlay, {
+              scaleX: 0,
+              transformOrigin: 'right',
+              duration: 0.5,
+              ease: 'power2.inOut',
+              onComplete: () => {
+                overlay?.remove();
+                // Réinitialiser les animations de la nouvelle page
+                initPageAnimations();
+              },
+            });
+          },
+        },
+      ],
+
+      // Hook appelé après chaque transition
+      views: [
+        {
+          namespace: 'home',
+          afterEnter() {
+            console.log('Page Home chargée');
+          },
+        },
+        {
+          namespace: 'projects',
+          afterEnter() {
+            console.log('Page Projects chargée');
+          },
+        },
+      ],
+    });
+
+    // Initialiser les animations au premier chargement
+    initPageAnimations();
+  </script>
+</body>
+</html>
