@@ -1,0 +1,112 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Portfolio Interactif - Projet" namespace="project-detail">
+  <!-- Hero Section -->
+  <section class="min-h-[60vh] flex items-center justify-center px-6 pt-20 bg-gradient-to-b from-black to-purple-900/20">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-full text-sm font-semibold mb-6 fade-in">
+        Creative Coding
+      </span>
+      <h1 class="text-6xl md:text-7xl font-bold mb-6 fade-in">
+        <span class="bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+          Portfolio Interactif
+        </span>
+      </h1>
+      <p class="text-xl text-gray-400 fade-in">
+        Site portfolio avec transitions Barba.js et animations GSAP
+      </p>
+    </div>
+  </section>
+
+  <!-- Project Image -->
+  <section class="px-6 py-12">
+    <div class="max-w-6xl mx-auto fade-in">
+      <div class="aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm border border-white/10 relative">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-96 h-96 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full opacity-30 blur-3xl"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center text-9xl opacity-20">
+          🎨
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project Details -->
+  <section class="px-6 py-12">
+    <div class="max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Client</h3>
+          <p class="text-xl font-semibold">Personnel</p>
+        </div>
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Année</h3>
+          <p class="text-xl font-semibold">2024</p>
+        </div>
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Rôle</h3>
+          <p class="text-xl font-semibold">Full Stack Dev</p>
+        </div>
+      </div>
+
+      <div class="prose prose-invert max-w-none">
+        <h2 class="text-4xl font-bold mb-6 fade-in">À propos du projet</h2>
+        <p class="text-lg text-gray-300 leading-relaxed mb-6 fade-in">
+          Ce portfolio a été conçu pour démontrer les capacités de Barba.js combiné avec GSAP 
+          pour créer des transitions de pages fluides et immersives. L'objectif était de créer 
+          une expérience utilisateur unique qui se démarque des portfolios traditionnels.
+        </p>
+        <p class="text-lg text-gray-300 leading-relaxed mb-6 fade-in">
+          L'architecture repose sur Astro pour la génération statique, offrant d'excellentes 
+          performances tout en permettant des interactions riches côté client grâce à Barba.js.
+        </p>
+
+        <h3 class="text-3xl font-bold mb-4 mt-12 fade-in">Technologies utilisées</h3>
+        <div class="flex flex-wrap gap-3 mb-12 fade-in">
+          {['Astro', 'Barba.js', 'GSAP', 'Tailwind CSS', 'TypeScript'].map((tech) => (
+            <span class="px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-full text-sm font-semibold">
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <h3 class="text-3xl font-bold mb-4 fade-in">Défis techniques</h3>
+        <ul class="space-y-4 mb-12">
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Gestion de la mémoire :</strong> Implémentation d'un système 
+            de nettoyage automatique des ScrollTriggers pour éviter les fuites mémoire.
+          </li>
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Compatibilité routing :</strong> Résolution des conflits entre 
+            le prefetching d'Astro et le routing client-side de Barba.js.
+          </li>
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Performance :</strong> Optimisation des animations GSAP pour 
+            maintenir 60fps même sur des appareils moins puissants.
+          </li>
+        </ul>
+      </div>
+
+      <!-- CTA -->
+      <div class="mt-16 flex gap-4 justify-center fade-in">
+        <a 
+          href="/projects" 
+          class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
+          data-astro-reload
+        >
+          Voir tous les projets
+        </a>
+        <a 
+          href="/contact" 
+          class="px-8 py-4 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300"
+          data-astro-reload
+        >
+          Me contacter
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>

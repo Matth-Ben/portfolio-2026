@@ -1,0 +1,132 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="E-commerce Moderne - Projet" namespace="project-detail">
+  <!-- Hero Section -->
+  <section class="min-h-[60vh] flex items-center justify-center px-6 pt-20 bg-gradient-to-b from-black to-blue-900/20">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block px-4 py-2 bg-blue-500/20 border border-blue-500/50 rounded-full text-sm font-semibold mb-6 fade-in">
+        E-commerce
+      </span>
+      <h1 class="text-6xl md:text-7xl font-bold mb-6 fade-in">
+        <span class="bg-gradient-to-r from-blue-400 to-cyan-600 bg-clip-text text-transparent">
+          E-commerce Moderne
+        </span>
+      </h1>
+      <p class="text-xl text-gray-400 fade-in">
+        Boutique en ligne avec expérience utilisateur premium
+      </p>
+    </div>
+  </section>
+
+  <!-- Project Image -->
+  <section class="px-6 py-12">
+    <div class="max-w-6xl mx-auto fade-in">
+      <div class="aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-white/10 relative">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-96 h-96 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full opacity-30 blur-3xl"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center text-9xl opacity-20">
+          🛍️
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project Details -->
+  <section class="px-6 py-12">
+    <div class="max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Client</h3>
+          <p class="text-xl font-semibold">Fashion Brand</p>
+        </div>
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Année</h3>
+          <p class="text-xl font-semibold">2023</p>
+        </div>
+        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
+          <h3 class="text-sm text-gray-400 mb-2">Rôle</h3>
+          <p class="text-xl font-semibold">Lead Front-End</p>
+        </div>
+      </div>
+
+      <div class="prose prose-invert max-w-none">
+        <h2 class="text-4xl font-bold mb-6 fade-in">À propos du projet</h2>
+        <p class="text-lg text-gray-300 leading-relaxed mb-6 fade-in">
+          Développement d'une plateforme e-commerce moderne pour une marque de mode premium. 
+          L'objectif était de créer une expérience d'achat fluide et visuellement captivante 
+          qui reflète l'identité de la marque.
+        </p>
+        <p class="text-lg text-gray-300 leading-relaxed mb-6 fade-in">
+          La plateforme intègre un système de panier avancé, des filtres de produits dynamiques, 
+          et une expérience mobile-first optimisée pour maximiser les conversions.
+        </p>
+
+        <h3 class="text-3xl font-bold mb-4 mt-12 fade-in">Technologies utilisées</h3>
+        <div class="flex flex-wrap gap-3 mb-12 fade-in">
+          {['Next.js', 'React', 'Tailwind CSS', 'Stripe', 'Shopify API', 'Vercel'].map((tech) => (
+            <span class="px-4 py-2 bg-blue-500/20 border border-blue-500/50 rounded-full text-sm font-semibold">
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <h3 class="text-3xl font-bold mb-4 fade-in">Fonctionnalités clés</h3>
+        <ul class="space-y-4 mb-12">
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Panier persistant :</strong> Synchronisation du panier entre 
+            appareils via localStorage et API.
+          </li>
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Filtres avancés :</strong> Système de filtrage multi-critères 
+            avec URL state management.
+          </li>
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Paiement sécurisé :</strong> Intégration Stripe avec 3D Secure 
+            et gestion des erreurs.
+          </li>
+          <li class="text-gray-300 fade-in">
+            <strong class="text-white">Performance :</strong> Score Lighthouse 95+ avec lazy loading 
+            et optimisation d'images.
+          </li>
+        </ul>
+
+        <h3 class="text-3xl font-bold mb-4 fade-in">Résultats</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div class="p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl text-center fade-in">
+            <p class="text-4xl font-bold text-blue-400 mb-2">+45%</p>
+            <p class="text-gray-300">Taux de conversion</p>
+          </div>
+          <div class="p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center fade-in">
+            <p class="text-4xl font-bold text-cyan-400 mb-2">-30%</p>
+            <p class="text-gray-300">Taux de rebond</p>
+          </div>
+          <div class="p-6 bg-blue-500/10 border border-blue-500/30 rounded-2xl text-center fade-in">
+            <p class="text-4xl font-bold text-blue-400 mb-2">95+</p>
+            <p class="text-gray-300">Score Lighthouse</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="mt-16 flex gap-4 justify-center fade-in">
+        <a 
+          href="/projects" 
+          class="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
+          data-astro-reload
+        >
+          Voir tous les projets
+        </a>
+        <a 
+          href="/contact" 
+          class="px-8 py-4 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300"
+          data-astro-reload
+        >
+          Me contacter
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>
