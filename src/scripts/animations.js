@@ -8,7 +8,9 @@ gsap.registerPlugin(ScrollTrigger);
  * @param {boolean} skipImmediate - Si true, n'anime pas immédiatement les éléments visibles
  */
 export function initPageAnimations(skipImmediate = false) {
-    // Petit délai pour s'assurer que le DOM est prêt
+    // Pour les transitions Barba, pas de délai. Pour le chargement initial, petit délai.
+    const delay = skipImmediate ? 0 : 100;
+
     setTimeout(() => {
         const fadeElements = document.querySelectorAll('.fade-in');
 
@@ -52,7 +54,7 @@ export function initPageAnimations(skipImmediate = false) {
         });
 
         console.log(`✅ Initialized ${fadeElements.length} fade-in animations`);
-    }, 100);
+    }, delay);
 }
 
 /**

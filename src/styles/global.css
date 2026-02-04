@@ -55,3 +55,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to bottom, #9333ea, #db2777);
 }
+
+/* Éléments avec animation fade-in doivent commencer invisibles */
+.fade-in {
+    opacity: 0;
+}
