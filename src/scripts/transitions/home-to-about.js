@@ -2,16 +2,11 @@ import { cleanupScrollTriggers } from '../animations.js';
 import { scrollToTop, destroyLenis, initLenis } from '../lenis.js';
 import { initPageAnimations } from '../animations.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import {
-    createOverlay,
-    removeOverlay,
-    fadeOutContent,
-    slideOverlay,
-} from './utils.js';
+import gsap from 'gsap';
 
 /**
  * Transition: Home → About
- * Slide horizontal de gauche à droite avec gradient purple
+ * TEMPORAIREMENT DÉSACTIVÉE pour modifications
  */
 export default {
     name: 'home-to-about',
@@ -19,41 +14,58 @@ export default {
     to: { namespace: ['about'] },
 
     async leave(data) {
-        const currentContainer = data.current.container;
+        const navLinks = document.querySelectorAll('.transition-link');
+        const mainHome = document.querySelector('.mainHome');
+        console.log('🚀 TRANSITION DÉCLENCHÉE: Home → About');
+        console.log('📦 Data:', data);
 
-        // Fade out du contenu actuel
-        await fadeOutContent(currentContainer);
+        gsap.to(navLinks, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out',
+            onComplete: () => {
+                gsap.to(mainHome, {
+                    width: '11.8rem',
+                    height: '90%',
+                    left: 'calc(100% - 11.8rem)',
+                    duration: 0.6,
+                    ease: 'power2.out'
+                });
+            }
+        });
+
+        // ⚠️ NAVIGATION BLOQUÉE - Décommentez le code ci-dessous pour activer la transition
+
+        /*
+        const currentContainer = data.current.container;
 
         // Cleanup
         cleanupScrollTriggers();
+        
+        // Fade out du contenu
+        await fadeOutContent(currentContainer);
+        */
 
-        // Créer overlay avec gradient purple
-        const overlay = createOverlay('#9333ea, #7c3aed');
-        document.body.appendChild(overlay);
-
-        // Slide in de gauche à droite
-        await slideOverlay(overlay, 'in', 'left');
+        // ⚠️ BLOQUER LA NAVIGATION - Rejeter la Promise pour empêcher le changement de page
+        return Promise.reject('Navigation bloquée pour debug');
     },
 
     async afterEnter(data) {
-        const overlay = document.getElementById('barba-overlay');
+        console.log('✨ Page About chargée');
+
+        /*
         const container = data.next.container;
-
-        container.style.opacity = '0';
-        container.style.visibility = 'visible';
-
+        
         scrollToTop();
         destroyLenis();
         initLenis();
-
-        // Slide out vers la droite
-        await slideOverlay(overlay, 'out', 'left');
-        removeOverlay();
-
-        // Initialiser les animations AVANT de rendre le container visible
+        
+        // Initialiser les animations
         initPageAnimations(true);
-
-        // Faire apparaître le container - les ScrollTriggers se déclencheront
+        
+        // Faire apparaître le container
         gsap.to(container, {
             opacity: 1,
             duration: 0.3,
@@ -62,7 +74,6 @@ export default {
                 ScrollTrigger.refresh();
             }
         });
-
-        console.log('✨ Transition: Home → About');
+        */
     },
 };

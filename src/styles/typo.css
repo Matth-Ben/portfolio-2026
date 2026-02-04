@@ -1,0 +1,34 @@
+/* h1 {
+    @apply text-[10rem] font-bold font-(family-name:--font-display);
+} */
+
+.ts-title {
+    font-size: 8rem;
+    line-height: 6rem;
+    text-transform: uppercase;
+    font-family: 'Cinderblock-100', sans-serif;
+}
+
+.ts-body {
+    font-size: 1.4rem;
+    line-height: 1.4rem;
+    text-transform: uppercase;
+    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.ts-little {
+    font-size: 1.2rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.ts-big {
+    font-size: 20rem;
+    line-height: 16rem;
+    text-transform: uppercase;
+    font-family: 'Cinderblock-100', sans-serif;
+}

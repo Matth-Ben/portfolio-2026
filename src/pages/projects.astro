@@ -1,50 +1,6 @@
 ---
-import MainLayout from '../layouts/MainLayout.astro';
-
-const projects = [
-  {
-    title: 'Portfolio Interactif',
-    description: 'Site portfolio avec transitions Barba.js et animations GSAP',
-    tags: ['Astro', 'GSAP', 'Barba.js'],
-    gradient: 'from-purple-500 to-pink-500',
-    url: '/project/portfolio-interactif',
-  },
-  {
-    title: 'E-commerce Moderne',
-    description: 'Boutique en ligne avec expérience utilisateur premium',
-    tags: ['React', 'Next.js', 'Tailwind'],
-    gradient: 'from-blue-500 to-cyan-500',
-    url: '/project/ecommerce-moderne',
-  },
-  {
-    title: 'Dashboard Analytics',
-    description: 'Interface de visualisation de données en temps réel',
-    tags: ['Vue.js', 'D3.js', 'WebGL'],
-    gradient: 'from-green-500 to-emerald-500',
-    url: '/project/dashboard-analytics',
-  },
-  {
-    title: 'Application Mobile',
-    description: 'App mobile hybride avec animations natives',
-    tags: ['React Native', 'TypeScript'],
-    gradient: 'from-orange-500 to-red-500',
-    url: '#',
-  },
-  {
-    title: 'Plateforme SaaS',
-    description: 'Solution B2B avec architecture micro-services',
-    tags: ['Node.js', 'PostgreSQL', 'Docker'],
-    gradient: 'from-indigo-500 to-purple-500',
-    url: '#',
-  },
-  {
-    title: 'Site Vitrine',
-    description: 'Landing page avec scroll parallax et animations 3D',
-    tags: ['Three.js', 'GSAP', 'WebGL'],
-    gradient: 'from-pink-500 to-rose-500',
-    url: '#',
-  },
-];
+import MainLayout from "../layouts/MainLayout.astro";
+import projectsData from "../data/projects-data.json";
 ---
 
 <MainLayout title="Portfolio - Projets" namespace="projects">
@@ -52,12 +8,14 @@ const projects = [
   <section class="min-h-[50vh] flex items-center justify-center px-6 pt-20">
     <div class="max-w-4xl mx-auto text-center">
       <h1 class="text-6xl md:text-7xl font-bold mb-6 fade-in">
-        <span class="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-          Mes Projets
+        <span
+          class="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
+        >
+          {projectsData.header.title}
         </span>
       </h1>
       <p class="text-xl text-gray-400 fade-in">
-        Une sélection de mes réalisations récentes
+        {projectsData.header.subtitle}
       </p>
     </div>
   </section>
@@ -66,38 +24,42 @@ const projects = [
   <section class="px-6 pb-20">
     <div class="max-w-7xl mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project) => (
-          <a href={project.url} data-astro-reload class="block">
-            <article class="group cursor-pointer fade-in">
-              <div class="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-8 h-full hover:border-white/30 transition-all duration-500">
-                {/* Gradient Background */}
-                <div class={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                
-                {/* Content */}
-                <div class="relative z-10">
-                  <h3 class="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
-                    {project.title}
-                  </h3>
-                  <p class="text-gray-400 mb-6 leading-relaxed">
-                    {project.description}
-                  </p>
-                  
-                  {/* Tags */}
-                  <div class="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span class="px-3 py-1 text-sm bg-white/10 rounded-full border border-white/20">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+        {
+          projectsData.projects.map((project) => (
+            <a href={project.url} data-astro-reload class="block">
+              <article class="group cursor-pointer fade-in">
+                <div class="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-8 h-full hover:border-white/30 transition-all duration-500">
+                  {/* Gradient Background */}
+                  <div
+                    class={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                  />
 
-                {/* Hover Effect */}
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-            </article>
-          </a>
-        ))}
+                  {/* Content */}
+                  <div class="relative z-10">
+                    <h3 class="text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
+                      {project.title}
+                    </h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                      {project.description}
+                    </p>
+
+                    {/* Tags */}
+                    <div class="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span class="px-3 py-1 text-sm bg-white/10 rounded-full border border-white/20">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Hover Effect */}
+                  <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
+              </article>
+            </a>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -105,17 +67,19 @@ const projects = [
   <!-- CTA Section -->
   <section class="px-6 pb-32">
     <div class="max-w-4xl mx-auto text-center">
-      <div class="p-12 bg-gradient-to-br from-purple-900/30 to-pink-900/30 backdrop-blur-sm rounded-3xl border border-white/10 fade-in">
-        <h2 class="text-4xl font-bold mb-4">Vous avez un projet ?</h2>
+      <div
+        class="p-12 bg-gradient-to-br from-purple-900/30 to-pink-900/30 backdrop-blur-sm rounded-3xl border border-white/10 fade-in"
+      >
+        <h2 class="text-4xl font-bold mb-4">{projectsData.cta.title}</h2>
         <p class="text-xl text-gray-300 mb-8">
-          Discutons de votre prochaine idée
+          {projectsData.cta.subtitle}
         </p>
-        <a 
-          href="/contact" 
+        <a
+          href={projectsData.cta.button.link}
           class="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
           data-astro-reload
         >
-          Me contacter
+          {projectsData.cta.button.text}
         </a>
       </div>
     </div>

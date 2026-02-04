@@ -1,62 +1,36 @@
 ---
-import MainLayout from '../layouts/MainLayout.astro';
+import MainLayout from "../layouts/MainLayout.astro";
+import homeData from "../data/home-data.json";
 ---
 
 <MainLayout title="Portfolio - Accueil" namespace="home">
   <!-- Hero Section -->
-  <section class="min-h-screen flex items-center justify-center px-6 pt-20">
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-6xl md:text-8xl font-bold mb-6 fade-in">
-        <span class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
-          Creative Developer
-        </span>
-      </h1>
-      <p class="text-xl md:text-2xl text-gray-400 mb-12 fade-in">
-        Spécialisé en Creative Coding & Expériences Interactives
-      </p>
-      <div class="flex gap-6 justify-center fade-in">
-        <a 
-          href="/projects" 
-          class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
-          data-astro-reload
-        >
-          Voir mes projets
-        </a>
-        <a 
-          href="#about" 
-          class="px-8 py-4 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300"
-        >
-          En savoir plus
-        </a>
-      </div>
-    </div>
-  </section>
+  <section
+    class="mainHome absolute inset-0 w-full h-screen m-auto overflow-hidden"
+  >
+    <nav
+      class="absolute top-1/2 left-0 right-0 z-10 px-[1rem] md:px-[2rem] -translate-y-full pb-[2rem]"
+    >
+      <ul class="flex items-center justify-between w-full">
+        <li>
+          <a class="ts-little transition-link block" href="/about" data-barba
+            >About</a
+          >
+        </li>
+        <li>
+          <a class="ts-little transition-link block" href="/contact" data-barba
+            >Contact</a
+          >
+        </li>
+      </ul>
+    </nav>
 
-  <!-- About Section -->
-  <section id="about" class="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-black to-purple-900/20">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl font-bold mb-8 fade-in">
-        À propos
-      </h2>
-      <p class="text-xl text-gray-300 leading-relaxed fade-in">
-        Passionné par l'intersection entre le code et la créativité, je crée des expériences web 
-        immersives et interactives. Spécialisé dans les animations GSAP, les transitions fluides 
-        avec Barba.js, et le développement front-end moderne.
-      </p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
-          <h3 class="text-2xl font-bold mb-3 text-purple-400">Design</h3>
-          <p class="text-gray-400">Interfaces modernes et esthétiques</p>
-        </div>
-        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
-          <h3 class="text-2xl font-bold mb-3 text-pink-400">Animation</h3>
-          <p class="text-gray-400">Transitions fluides et micro-interactions</p>
-        </div>
-        <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
-          <h3 class="text-2xl font-bold mb-3 text-red-400">Performance</h3>
-          <p class="text-gray-400">Optimisation et expérience utilisateur</p>
-        </div>
-      </div>
+    <div class="relative w-full h-screen">
+      <img
+        src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
+        alt="Chaillot"
+        class="w-full h-screen object-cover"
+      />
     </div>
   </section>
 </MainLayout>

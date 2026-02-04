@@ -17,64 +17,14 @@ const { title, namespace } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
-  <body class="bg-black text-white font-sans antialiased">
+  <body class="bg-[#232323] text-[#EAE8DE] uppercase">
     <div data-barba="wrapper">
-      <!-- Navigation persistante -->
-      <nav
-        class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10"
-      >
-        <div class="container mx-auto px-6 py-4">
-          <div class="flex items-center justify-between">
-            <a
-              href="/"
-              class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent"
-            >
-              Portfolio
-            </a>
-            <ul class="flex gap-8">
-              <li>
-                <a
-                  href="/"
-                  class="hover:text-purple-400 transition-colors duration-300"
-                  data-astro-reload
-                >
-                  Accueil
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/about"
-                  class="hover:text-purple-400 transition-colors duration-300"
-                  data-astro-reload
-                >
-                  À propos
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/projects"
-                  class="hover:text-purple-400 transition-colors duration-300"
-                  data-astro-reload
-                >
-                  Projets
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/contact"
-                  class="hover:text-purple-400 transition-colors duration-300"
-                  data-astro-reload
-                >
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-
       <!-- Container Barba pour le contenu des pages -->
-      <main data-barba="container" data-barba-namespace={namespace}>
+      <main
+        class="relative min-h-screen"
+        data-barba="container"
+        data-barba-namespace={namespace}
+      >
         <slot />
       </main>
     </div>

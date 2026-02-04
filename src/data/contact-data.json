@@ -1,0 +1,18 @@
+{
+    "hero": {
+        "title": "Let’s collaborate"
+    },
+    "info": {
+        "email": "matthias.benoit@gmail.com",
+        "contacts": [
+            {
+                "label": "Github",
+                "link": "https://github.com/Matth-Ben"
+            },
+            {
+                "label": "LinkedIn",
+                "link": "www.linkedin.com/in/matthias-benoit-25b47812a"
+            }
+        ]
+    }
+}

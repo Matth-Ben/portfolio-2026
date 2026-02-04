@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-@import "tailwindcss";
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+@theme {
+    --font-display: "Cinderblock-100";
 }
+
+@import "./fonts.css";
+@import "./typo.css";
+@import "tailwindcss";
 
 html {
     /* Lenis gère le scroll, donc on désactive le scroll natif */
+    font-size: 10px;
     overflow-x: hidden;
 }
 
@@ -34,8 +34,17 @@ html.lenis body {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'IBM Plex Mono', sans-serif;
     overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 400;
 }
 
 /* Custom scrollbar */

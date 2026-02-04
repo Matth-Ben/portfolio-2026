@@ -1,0 +1,81 @@
+{
+    "header": {
+        "title": "Mes Projets",
+        "subtitle": "Une sélection de mes réalisations récentes"
+    },
+    "projects": [
+        {
+            "title": "Portfolio Interactif",
+            "description": "Site portfolio avec transitions Barba.js et animations GSAP",
+            "tags": [
+                "Astro",
+                "GSAP",
+                "Barba.js"
+            ],
+            "gradient": "from-purple-500 to-pink-500",
+            "url": "/project/portfolio-interactif"
+        },
+        {
+            "title": "E-commerce Moderne",
+            "description": "Boutique en ligne avec expérience utilisateur premium",
+            "tags": [
+                "React",
+                "Next.js",
+                "Tailwind"
+            ],
+            "gradient": "from-blue-500 to-cyan-500",
+            "url": "/project/ecommerce-moderne"
+        },
+        {
+            "title": "Dashboard Analytics",
+            "description": "Interface de visualisation de données en temps réel",
+            "tags": [
+                "Vue.js",
+                "D3.js",
+                "WebGL"
+            ],
+            "gradient": "from-green-500 to-emerald-500",
+            "url": "/project/dashboard-analytics"
+        },
+        {
+            "title": "Application Mobile",
+            "description": "App mobile hybride avec animations natives",
+            "tags": [
+                "React Native",
+                "TypeScript"
+            ],
+            "gradient": "from-orange-500 to-red-500",
+            "url": "#"
+        },
+        {
+            "title": "Plateforme SaaS",
+            "description": "Solution B2B avec architecture micro-services",
+            "tags": [
+                "Node.js",
+                "PostgreSQL",
+                "Docker"
+            ],
+            "gradient": "from-indigo-500 to-purple-500",
+            "url": "#"
+        },
+        {
+            "title": "Site Vitrine",
+            "description": "Landing page avec scroll parallax et animations 3D",
+            "tags": [
+                "Three.js",
+                "GSAP",
+                "WebGL"
+            ],
+            "gradient": "from-pink-500 to-rose-500",
+            "url": "#"
+        }
+    ],
+    "cta": {
+        "title": "Vous avez un projet ?",
+        "subtitle": "Discutons de votre prochaine idée",
+        "button": {
+            "text": "Me contacter",
+            "link": "/contact"
+        }
+    }
+}

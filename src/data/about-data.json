@@ -1,0 +1,12 @@
+{
+    "hero": {
+        "title": "Hey i'm Matthias, a</br>French creative developer",
+        "description": "Lorem ipsum dolor sit amet consectetur. Sit ornare porttitor pretium elit euismod eu morbi. Sed nisi enim pellentesque vitae suspendisse amet. In massa cras nibh congue tincidunt nisi turpis nunc. Tristique sem quisque nunc pretium. Tristique diam lobortis nam sed non sagittis. Ac ut nec egestas est quis non tristique nulla sed."
+    },
+    "skills": [
+        "Wordpress",
+        "CSS",
+        "HTML",
+        "Backend"
+    ]
+}

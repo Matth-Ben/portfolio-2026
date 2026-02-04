@@ -15,7 +15,7 @@ import projectDetailToHome from './transitions/project-detail-to-home.js';
  */
 export function initBarba() {
     barba.init({
-        debug: false,
+        debug: true, // ⚠️ MODE DEBUG ACTIVÉ
         transitions: [
             // Transitions personnalisées (ordre important: du plus spécifique au plus général)
             homeToAbout,

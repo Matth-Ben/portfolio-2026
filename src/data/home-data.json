@@ -1,0 +1,37 @@
+{
+    "hero": {
+        "title": "Creative Developer",
+        "subtitle": "Spécialisé en Creative Coding & Expériences Interactives",
+        "cta": {
+            "primary": {
+                "text": "Voir mes projets",
+                "link": "/projects"
+            },
+            "secondary": {
+                "text": "En savoir plus",
+                "link": "#about"
+            }
+        }
+    },
+    "about": {
+        "title": "À propos",
+        "description": "Passionné par l'intersection entre le code et la créativité, je crée des expériences web immersives et interactives. Spécialisé dans les animations GSAP, les transitions fluides avec Barba.js, et le développement front-end moderne.",
+        "skills": [
+            {
+                "title": "Design",
+                "description": "Interfaces modernes et esthétiques",
+                "color": "purple"
+            },
+            {
+                "title": "Animation",
+                "description": "Transitions fluides et micro-interactions",
+                "color": "pink"
+            },
+            {
+                "title": "Performance",
+                "description": "Optimisation et expérience utilisateur",
+                "color": "red"
+            }
+        ]
+    }
+}

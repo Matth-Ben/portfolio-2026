@@ -1,128 +1,67 @@
 ---
-import MainLayout from '../layouts/MainLayout.astro';
-
-const skills = [
-  { category: 'Front-End', items: ['React', 'Vue.js', 'Astro', 'Next.js', 'TypeScript'] },
-  { category: 'Animation', items: ['GSAP', 'Barba.js', 'Three.js', 'Framer Motion', 'Lottie'] },
-  { category: 'Styling', items: ['Tailwind CSS', 'Sass', 'CSS-in-JS', 'Styled Components'] },
-  { category: 'Tools', items: ['Git', 'Webpack', 'Vite', 'Docker', 'Figma'] },
-];
-
-const experience = [
-  {
-    year: '2024',
-    role: 'Creative Developer',
-    company: 'Studio Digital',
-    description: 'Création d\'expériences web immersives et interactives pour des clients premium.',
-  },
-  {
-    year: '2022-2023',
-    role: 'Front-End Developer',
-    company: 'Tech Agency',
-    description: 'Développement d\'applications web modernes avec React et Vue.js.',
-  },
-  {
-    year: '2020-2022',
-    role: 'Web Developer',
-    company: 'Startup Inc.',
-    description: 'Développement full-stack et intégration de designs créatifs.',
-  },
-];
+import MainLayout from "../layouts/MainLayout.astro";
+import aboutData from "../data/about-data.json";
 ---
 
 <MainLayout title="Portfolio - À propos" namespace="about">
   <!-- Hero Section -->
-  <section class="min-h-screen flex items-center justify-center px-6 pt-20">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <!-- Left: Text -->
-        <div>
-          <h1 class="text-6xl md:text-7xl font-bold mb-6 fade-in">
-            <span class="bg-gradient-to-r from-green-400 to-blue-600 bg-clip-text text-transparent">
-              À propos
-            </span>
+  <section
+    class="relative h-screen flex flex-col justify-between p-6 overflow-hidden"
+  >
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-11 text-center">
+        <div class="flex items-center justify-center gap-2">
+          {
+            aboutData.skills.map((skill, index) => (
+              <div class="ts-body flex items-center gap-2">
+                <span class="fade-in">{skill}</span>
+                {index < aboutData.skills.length - 1 && (
+                  <span class="fade-in">/</span>
+                )}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <div
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full"
+    >
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-11">
+          <h1 class="ts-big text-center fade-in">
+            <Fragment set:html={aboutData.hero.title} />
           </h1>
-          <p class="text-xl text-gray-300 leading-relaxed mb-6 fade-in">
-            Développeur créatif passionné par l'intersection entre le code, le design et l'animation. 
-            Je transforme des idées en expériences web mémorables.
-          </p>
-          <p class="text-lg text-gray-400 leading-relaxed fade-in">
-            Avec plus de 5 ans d'expérience dans le développement front-end, je me spécialise dans 
-            la création d'interfaces utilisateur fluides, performantes et visuellement captivantes. 
-            Mon approche combine rigueur technique et sensibilité artistique.
-          </p>
-          <div class="mt-8 flex gap-4 fade-in">
-            <a 
-              href="/contact" 
-              class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-full font-semibold hover:scale-105 transition-transform duration-300"
-              data-astro-reload
-            >
-              Me contacter
-            </a>
-            <a 
-              href="/projects" 
-              class="px-8 py-4 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors duration-300"
-              data-astro-reload
-            >
-              Voir mes projets
-            </a>
-          </div>
         </div>
-
-        <!-- Right: Image placeholder -->
-        <div class="fade-in">
-          <div class="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-green-500/20 to-blue-500/20 backdrop-blur-sm border border-white/10">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="w-64 h-64 bg-gradient-to-br from-green-400 to-blue-600 rounded-full opacity-50 blur-3xl"></div>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center text-9xl opacity-20">
-              👨‍💻
-            </div>
-          </div>
-        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-3 col-start-5">
+        <p class="ts-little text-center">
+          {aboutData.hero.description}
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- Skills Section -->
-  <section class="px-6 py-20 bg-gradient-to-b from-black to-green-900/10">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-5xl font-bold mb-12 text-center fade-in">Compétences</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {skills.map((skillSet) => (
-          <div class="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 fade-in">
-            <h3 class="text-2xl font-bold mb-4 text-green-400">{skillSet.category}</h3>
-            <ul class="space-y-2">
-              {skillSet.items.map((skill) => (
-                <li class="text-gray-300 flex items-center gap-2">
-                  <span class="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-full"></span>
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Experience Section -->
-  <section class="px-6 py-20">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl font-bold mb-12 text-center fade-in">Expérience</h2>
-      <div class="space-y-8">
-        {experience.map((exp, index) => (
-          <div class="relative pl-8 border-l-2 border-white/20 fade-in">
-            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-gradient-to-r from-green-400 to-blue-400 rounded-full"></div>
-            <div class="pb-8">
-              <span class="text-sm text-green-400 font-semibold">{exp.year}</span>
-              <h3 class="text-2xl font-bold mt-2">{exp.role}</h3>
-              <p class="text-lg text-gray-400 mt-1">{exp.company}</p>
-              <p class="text-gray-300 mt-3 leading-relaxed">{exp.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+  <section
+    class="absolute inset-0 w-full h-screen m-auto overflow-hidden"
+    style="left: calc(100% - 11.8rem); height: 90%; width: 11.8rem;"
+  >
+    <nav class="absolute top-1/2 left-0 right-0 z-10 -translate-y-full">
+      <ul class="flex items-center justify-between w-full">
+        <li>
+          <a class="ts-little transition-link block" href="/" data-barba>Back</a
+          >
+        </li>
+      </ul>
+    </nav>
+    <div class="relative w-full h-screen">
+      <img
+        src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
+        alt="Chaillot"
+        class="w-full h-screen object-cover"
+      />
     </div>
   </section>
 </MainLayout>
