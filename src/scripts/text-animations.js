@@ -16,9 +16,15 @@ const observers = [];
 /**
  * Initialize text animations
  */
-export const initTextAnimations = () => {
+export const initTextAnimations = async () => {
     // Clean up previous animations and observers
     cleanup();
+
+    // Attendre que les polices soient chargées
+    await waitForFonts();
+
+    // Attendre un frame supplémentaire pour que le layout soit stable
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     // Find all elements with data-text-split attribute
     const elements = document.querySelectorAll('[data-text-split]');
@@ -92,6 +98,20 @@ export const initTextAnimations = () => {
         activeAnimations.push({ element, split });
     });
 };
+
+/**
+ * Wait for fonts to be loaded
+ */
+async function waitForFonts() {
+    if ('fonts' in document) {
+        try {
+            await document.fonts.ready;
+            console.log('✅ Fonts loaded');
+        } catch (error) {
+            console.warn('Font loading check failed:', error);
+        }
+    }
+}
 
 /**
  * Get initial state for animation type

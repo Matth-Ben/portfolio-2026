@@ -34,6 +34,7 @@ class TextAnimationDebugger {
 
     const panel = document.createElement('div');
     panel.className = 'text-debugger';
+    panel.dataset.lenisPrevent = true;
     panel.innerHTML = `
       <div class="text-debugger-header">
         <h3 class="text-debugger-title">Text Animations</h3>
@@ -43,7 +44,7 @@ class TextAnimationDebugger {
       <div class="text-debugger-content">
         <div class="text-debugger-section">
           <div class="text-debugger-section-title">Elements</div>
-          <div class="text-debugger-elements" id="debugger-elements"></div>
+          <div class="text-debugger-elements" data-lenis-prevent id="debugger-elements"></div>
         </div>
 
         <div class="text-debugger-controls" id="debugger-controls">

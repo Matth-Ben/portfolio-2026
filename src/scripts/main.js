@@ -19,8 +19,8 @@ async function init() {
     // 2. Initialiser les animations de la page
     initPageAnimations();
 
-    // 3. Initialiser les animations de texte
-    initTextAnimations();
+    // 3. Initialiser les animations de texte (attendre les polices)
+    await initTextAnimations();
 
     // 4. Initialiser Barba.js pour les transitions
     initBarba();
