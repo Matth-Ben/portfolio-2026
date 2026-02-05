@@ -61,7 +61,7 @@ export default {
         initPageAnimations(true);
 
         // Rafraîchir le debugger (dev only)
-        if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+        if (window.refreshTextAnimationDebugger) {
             window.refreshTextAnimationDebugger();
         }
 

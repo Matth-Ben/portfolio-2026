@@ -62,11 +62,10 @@ export function initBarba() {
             },
         ],
 
-        // Global hooks
         hooks: {
             afterEnter() {
-                // Refresh debugger after page transition (dev only)
-                if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+                // Refresh debugger after page transition
+                if (window.refreshTextAnimationDebugger) {
                     window.refreshTextAnimationDebugger();
                 }
             }
