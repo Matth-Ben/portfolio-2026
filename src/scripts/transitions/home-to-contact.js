@@ -8,6 +8,7 @@ import {
     fadeOutContent,
     slideOverlayVertical,
 } from './utils.js';
+import gsap from 'gsap';
 
 /**
  * Transition: Home → Contact
@@ -58,6 +59,11 @@ export default {
         });
 
         initPageAnimations(true);
+
+        // Rafraîchir le debugger (dev only)
+        if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+            window.refreshTextAnimationDebugger();
+        }
 
         console.log('✨ Transition: Home → Contact');
     },

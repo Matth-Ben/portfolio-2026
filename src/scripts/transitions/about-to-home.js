@@ -8,6 +8,7 @@ import {
     fadeOutContent,
     slideOverlay,
 } from './utils.js';
+import gsap from 'gsap';
 
 /**
  * Transition: About → Home
@@ -20,45 +21,66 @@ export default {
 
     async leave(data) {
         const currentContainer = data.current.container;
+        const navLinks = document.querySelectorAll('.transition-link');
+        const transitionSection = document.querySelector('.transition-section');
+        const elemsFadeIn = document.querySelectorAll('.fade-in');
 
-        await fadeOutContent(currentContainer);
         cleanupScrollTriggers();
 
-        // Gradient vert pour le retour
-        const overlay = createOverlay('#10b981, #059669');
-        document.body.appendChild(overlay);
-
-        // Slide in de droite à gauche
-        await slideOverlay(overlay, 'in', 'right');
-    },
-
-    async afterEnter(data) {
-        const overlay = document.getElementById('barba-overlay');
-        const container = data.next.container;
-
-        container.style.opacity = '0';
-        container.style.visibility = 'visible';
-
-        scrollToTop();
-        destroyLenis();
-        initLenis();
-
-        // Slide out vers la gauche
-        await slideOverlay(overlay, 'out', 'right');
-        removeOverlay();
-
-        // Faire apparaître le container ET initialiser les animations en même temps
-        gsap.to(container, {
-            opacity: 1,
+        await gsap.to(elemsFadeIn, {
+            opacity: 0,
+            yPercent: 100,
             duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
+
+        await gsap.to(navLinks, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
+
+        await gsap.to(transitionSection, {
+            width: '100%',
+            height: '100%',
+            left: '0',
+            duration: 0.6,
             ease: 'power2.out',
             onComplete: () => {
                 ScrollTrigger.refresh();
             }
         });
+    },
+
+    async afterEnter(data) {
+        console.log('✨ Page Home chargée');
+        const links = document.querySelectorAll('.transition-link');
+
+        gsap.fromTo(links, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        }, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out',
+            onComplete: () => {
+                console.log('✨ Links appear');
+            }
+        })
 
         initPageAnimations(true);
 
-        console.log('✨ Transition: About → Home');
+        // Rafraîchir le debugger (dev only)
+        if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+            window.refreshTextAnimationDebugger();
+        }
     },
 };

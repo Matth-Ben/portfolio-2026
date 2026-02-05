@@ -10,15 +10,17 @@ import aboutData from "../data/about-data.json";
   >
     <div class="grid grid-cols-12 gap-6">
       <div class="col-span-11 text-center">
-        <div class="flex items-center justify-center gap-2">
+        <div
+          class="flex items-center justify-center ts-body"
+          data-text-split="chars"
+          data-text-animation="fade"
+        >
           {
             aboutData.skills.map((skill, index) => (
-              <div class="ts-body flex items-center gap-2">
-                <span class="fade-in">{skill}</span>
-                {index < aboutData.skills.length - 1 && (
-                  <span class="fade-in">/</span>
-                )}
-              </div>
+              <Fragment>
+                {skill}
+                {index !== aboutData.skills.length - 1 && "/"}
+              </Fragment>
             ))
           }
         </div>
@@ -29,7 +31,13 @@ import aboutData from "../data/about-data.json";
     >
       <div class="grid grid-cols-12 gap-6">
         <div class="col-span-11">
-          <h1 class="ts-big text-center fade-in">
+          <h1
+            class="ts-big text-center"
+            data-text-split="lines"
+            data-text-animation="slideUp"
+            data-text-duration="0.8"
+            data-text-trigger="load"
+          >
             <Fragment set:html={aboutData.hero.title} />
           </h1>
         </div>
@@ -37,7 +45,12 @@ import aboutData from "../data/about-data.json";
     </div>
     <div class="grid grid-cols-12 gap-6">
       <div class="col-span-3 col-start-5">
-        <p class="ts-little text-center">
+        <p
+          class="ts-little text-center"
+          data-text-split="lines"
+          data-text-animation="slideUp"
+          data-text-trigger="load"
+        >
           {aboutData.hero.description}
         </p>
       </div>
@@ -45,7 +58,7 @@ import aboutData from "../data/about-data.json";
   </section>
 
   <section
-    class="absolute inset-0 w-full h-screen m-auto overflow-hidden"
+    class="transition-section absolute inset-0 w-full h-screen m-auto overflow-hidden"
     style="left: calc(100% - 11.8rem); height: 90%; width: 11.8rem;"
   >
     <nav class="absolute top-1/2 left-0 right-0 z-10 -translate-y-full">

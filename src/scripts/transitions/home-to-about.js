@@ -16,64 +16,57 @@ export default {
     async leave(data) {
         const navLinks = document.querySelectorAll('.transition-link');
         const mainHome = document.querySelector('.mainHome');
-        console.log('🚀 TRANSITION DÉCLENCHÉE: Home → About');
-        console.log('📦 Data:', data);
 
-        gsap.to(navLinks, {
+        cleanupScrollTriggers();
+
+        await gsap.to(navLinks, {
             opacity: 0,
             yPercent: 100,
             duration: 0.3,
             stagger: 0.1,
-            ease: 'power2.out',
-            onComplete: () => {
-                gsap.to(mainHome, {
-                    width: '11.8rem',
-                    height: '90%',
-                    left: 'calc(100% - 11.8rem)',
-                    duration: 0.6,
-                    ease: 'power2.out'
-                });
-            }
+            ease: 'power2.out'
         });
 
-        // ⚠️ NAVIGATION BLOQUÉE - Décommentez le code ci-dessous pour activer la transition
-
-        /*
-        const currentContainer = data.current.container;
-
-        // Cleanup
-        cleanupScrollTriggers();
-        
-        // Fade out du contenu
-        await fadeOutContent(currentContainer);
-        */
-
-        // ⚠️ BLOQUER LA NAVIGATION - Rejeter la Promise pour empêcher le changement de page
-        return Promise.reject('Navigation bloquée pour debug');
-    },
-
-    async afterEnter(data) {
-        console.log('✨ Page About chargée');
-
-        /*
-        const container = data.next.container;
-        
-        scrollToTop();
-        destroyLenis();
-        initLenis();
-        
-        // Initialiser les animations
-        initPageAnimations(true);
-        
-        // Faire apparaître le container
-        gsap.to(container, {
-            opacity: 1,
-            duration: 0.3,
+        await gsap.to(mainHome, {
+            width: '11.8rem',
+            height: '90%',
+            left: 'calc(100% - 11.8rem)',
+            duration: 0.6,
             ease: 'power2.out',
             onComplete: () => {
                 ScrollTrigger.refresh();
             }
         });
-        */
+    },
+
+    async afterEnter(data) {
+        console.log('✨ Page About chargée');
+        const links = document.querySelectorAll('.transition-link');
+
+        gsap.fromTo(links, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        }, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out',
+            onComplete: () => {
+                console.log('✨ Links appear');
+            }
+        })
+
+        // Réinitialiser les animations de texte pour la nouvelle page
+        const { initTextAnimations } = await import('../text-animations.js');
+        initTextAnimations();
+
+        // Rafraîchir le debugger (dev only)
+        if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+            window.refreshTextAnimationDebugger();
+        }
     },
 };

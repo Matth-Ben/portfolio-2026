@@ -61,6 +61,16 @@ export function initBarba() {
                 },
             },
         ],
+
+        // Global hooks
+        hooks: {
+            afterEnter() {
+                // Refresh debugger after page transition (dev only)
+                if (import.meta.env.DEV && window.refreshTextAnimationDebugger) {
+                    window.refreshTextAnimationDebugger();
+                }
+            }
+        }
     });
 
     console.log('✅ Barba.js initialized with custom transitions');
