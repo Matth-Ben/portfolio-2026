@@ -1,0 +1,38 @@
+/**
+ * Page Loader Overlay Styles
+ * Smooth fade-in transition for initial page load
+ */
+
+.page-loader {
+    position: fixed;
+    inset: 0;
+    background: #232323;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-loader.hidden {
+    opacity: 0;
+}
+
+/* Optional: Add a subtle loading indicator */
+.page-loader::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(234, 232, 222, 0.1);
+    border-top-color: #EAE8DE;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

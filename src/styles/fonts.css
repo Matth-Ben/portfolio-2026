@@ -126,6 +126,7 @@
         url('/fonts/cinderblock-100.svg#youworkforthem') format('svg');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 /* ===================================

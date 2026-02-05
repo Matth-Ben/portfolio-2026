@@ -82,6 +82,9 @@ export const initTextAnimations = async () => {
             return;
         }
 
+        // Mark element as ready (makes it visible)
+        element.classList.add('split-ready');
+
         // Set initial state based on animation type
         const initialState = getInitialState(animation);
         gsap.set(targets, initialState);
@@ -100,12 +103,14 @@ export const initTextAnimations = async () => {
 };
 
 /**
- * Wait for fonts to be loaded
+ * Wait for fonts to be loaded (with timeout fallback)
  */
 async function waitForFonts() {
     if ('fonts' in document) {
         try {
-            await document.fonts.ready;
+            // Race between fonts.ready and 2s timeout
+            const timeout = new Promise(resolve => setTimeout(resolve, 2000));
+            await Promise.race([document.fonts.ready, timeout]);
             console.log('✅ Fonts loaded');
         } catch (error) {
             console.warn('Font loading check failed:', error);

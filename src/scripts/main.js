@@ -28,7 +28,22 @@ async function init() {
     // 5. Initialiser le debugger d'animations (always active)
     initTextAnimationDebugger();
 
+    // 6. Hide page loader
+    hideLoader();
+
     console.log('✅ Portfolio initialized successfully');
+}
+
+/**
+ * Hide the page loader with smooth fade-out
+ */
+function hideLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('hidden');
+        // Remove from DOM after transition
+        setTimeout(() => loader.remove(), 500);
+    }
 }
 
 /**

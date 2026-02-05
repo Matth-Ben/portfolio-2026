@@ -69,3 +69,19 @@ h6 {
 .fade-in {
     opacity: 0;
 }
+
+/* Content masking - Hide text-split elements until ready */
+[data-text-split] {
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-text-split].split-ready {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Prevent layout shift during split */
+[data-text-split] {
+    min-height: 1em;
+}

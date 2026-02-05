@@ -16,6 +16,13 @@ import projectDetailToHome from './transitions/project-detail-to-home.js';
 export function initBarba() {
     barba.init({
         debug: true, // ⚠️ MODE DEBUG ACTIVÉ
+
+        // Performance optimizations
+        prefetch: true,           // Précharge les pages au survol des liens
+        prefetchIgnore: true,     // Ignore les liens externes
+        cacheIgnore: false,       // Active le cache des pages visitées
+        timeout: 5000,            // Timeout de 5s pour les transitions
+
         transitions: [
             // Transitions personnalisées (ordre important: du plus spécifique au plus général)
             homeToAbout,
