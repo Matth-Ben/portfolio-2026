@@ -6,12 +6,13 @@ import {
     createOverlay,
     removeOverlay,
     fadeOutContent,
-    slideOverlayVertical,
+    slideOverlay,
 } from './utils.js';
+import gsap from 'gsap';
 
 /**
  * Transition: Contact → Home
- * Slide vertical de bas en haut avec gradient cyan
+ * Slide horizontal de droite à gauche avec gradient green
  */
 export default {
     name: 'contact-to-home',
@@ -20,42 +21,60 @@ export default {
 
     async leave(data) {
         const currentContainer = data.current.container;
+        const navLinks = document.querySelectorAll('.transition-link');
+        const transitionSection = document.querySelector('.transition-section');
+        const elemsFadeIn = document.querySelectorAll('.fade-in');
 
-        await fadeOutContent(currentContainer);
         cleanupScrollTriggers();
 
-        // Gradient cyan pour le retour
-        const overlay = createOverlay('#06b6d4, #0891b2');
-        document.body.appendChild(overlay);
-
-        // Slide vertical de bas en haut
-        await slideOverlayVertical(overlay, 'in', 'bottom');
-    },
-
-    async afterEnter(data) {
-        const overlay = document.getElementById('barba-overlay');
-        const container = data.next.container;
-
-        container.style.opacity = '0';
-        container.style.visibility = 'visible';
-
-        scrollToTop();
-        destroyLenis();
-        initLenis();
-
-        // Slide out vers le haut
-        await slideOverlayVertical(overlay, 'out', 'bottom');
-        removeOverlay();
-
-        // Faire apparaître le container ET initialiser les animations en même temps
-        gsap.to(container, {
-            opacity: 1,
+        await gsap.to(elemsFadeIn, {
+            opacity: 0,
+            yPercent: 100,
             duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
+
+        await gsap.to(navLinks, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
+
+        await gsap.to(transitionSection, {
+            width: '100%',
+            height: '100%',
+            right: '0',
+            duration: 0.6,
             ease: 'power2.out',
             onComplete: () => {
                 ScrollTrigger.refresh();
             }
         });
+    },
+
+    async afterEnter(data) {
+        console.log('✨ Page Home chargée');
+        const links = document.querySelectorAll('.transition-link');
+
+        gsap.fromTo(links, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        }, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out',
+            onComplete: () => {
+                console.log('✨ Links appear');
+            }
+        })
 
         initPageAnimations(true);
 
@@ -63,7 +82,5 @@ export default {
         if (window.refreshTextAnimationDebugger) {
             window.refreshTextAnimationDebugger();
         }
-
-        console.log('✨ Transition: Contact → Home');
     },
 };
