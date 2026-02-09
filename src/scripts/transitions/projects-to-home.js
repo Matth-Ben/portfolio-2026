@@ -1,13 +1,4 @@
-import { cleanupScrollTriggers } from '../animations.js';
-import { scrollToTop, destroyLenis, initLenis } from '../lenis.js';
-import { initPageAnimations } from '../animations.js';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import {
-    createOverlay,
-    removeOverlay,
-    fadeOutContent,
-    fadeOverlay,
-} from './utils.js';
+import gsap from 'gsap';
 
 /**
  * Transition: Projects → Home
@@ -19,49 +10,35 @@ export default {
     to: { namespace: ['home'] },
 
     async leave(data) {
-        const currentContainer = data.current.container;
+        const imageWrappered = document.querySelectorAll('.imageWrappered:not(.active)');
+        const imageWrapperedActive = document.querySelector('.imageWrappered.active');
 
-        await fadeOutContent(currentContainer);
-        cleanupScrollTriggers();
+        gsap.to(imageWrappered, {
+            opacity: 0,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
 
-        // Gradient bleu pour le retour
-        const overlay = createOverlay('#3b82f6, #2563eb');
-        document.body.appendChild(overlay);
-
-        await fadeOverlay(overlay, 'in');
+        await gsap.fromTo(imageWrapperedActive, {
+            width: '69rem',
+        }, {
+            width: '100%',
+            duration: 0.3,
+            ease: 'power2.out'
+        });
     },
 
     async afterEnter(data) {
-        const overlay = document.getElementById('barba-overlay');
-        const container = data.next.container;
+        const allProjects = document.querySelector('.all-projects-btn');
 
-        container.style.opacity = '0';
-        container.style.visibility = 'visible';
-
-        scrollToTop();
-        destroyLenis();
-        initLenis();
-
-        await fadeOverlay(overlay, 'out');
-        removeOverlay();
-
-        // Faire apparaître le container ET initialiser les animations en même temps
-        gsap.to(container, {
+        gsap.fromTo(allProjects, {
+            opacity: 0,
+            duration: 0.3,
+            ease: 'power2.out'
+        }, {
             opacity: 1,
             duration: 0.3,
-            ease: 'power2.out',
-            onComplete: () => {
-                ScrollTrigger.refresh();
-            }
+            ease: 'power2.out'
         });
-
-        initPageAnimations(true);
-
-        // Rafraîchir le debugger (dev only)
-        if (window.refreshTextAnimationDebugger) {
-            window.refreshTextAnimationDebugger();
-        }
-
-        console.log('✨ Transition: Projects → Home');
     },
 };

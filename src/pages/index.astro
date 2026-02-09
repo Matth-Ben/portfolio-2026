@@ -9,7 +9,7 @@ import homeData from "../data/home-data.json";
     class="mainHome absolute inset-0 w-full h-screen m-auto overflow-hidden"
   >
     <nav
-      class="absolute top-1/2 left-0 right-0 z-10 px-[1rem] md:px-[2rem] -translate-y-full pb-[2rem]"
+      class="absolute top-1/2 left-0 right-0 z-20 px-[1rem] md:px-[2rem] -translate-y-full pb-[2rem]"
     >
       <ul class="flex items-center justify-between w-full">
         <li>
@@ -25,12 +25,112 @@ import homeData from "../data/home-data.json";
       </ul>
     </nav>
 
-    <div class="relative w-full h-screen">
-      <img
-        src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
-        alt="Chaillot"
-        class="w-full h-screen object-cover"
-      />
+    <div
+      id="navigation-info"
+      class="absolute top-1/2 left-0 right-0 z-20 max-md:h-1/2 px-[1rem] md:px-[2rem]"
+    >
+      <div class="relative">
+        <div class="relative w-full h-[1px] bg-[#EAE8DE] opacity-30"></div>
+        <div
+          class="progress-bar absolute top-0 left-0 h-full bg-white w-full translate-y-1/2"
+          style="transform: scaleX(0); transform-origin: left;"
+        >
+        </div>
+      </div>
+      <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem]">
+        <div
+          class="col-span-8 md:col-span-7 order-2 md:order-1 max-md:flex max-md:justify-center max-md:items-end max-md:pb-[2rem]"
+        >
+          <h1 class="ts-title text-center md:text-left">
+            Matthias benoit<br />
+            French creative developer
+          </h1>
+        </div>
+        <div
+          class="col-span-8 md:col-span-5 lg:col-span-3 xl:col-span-2 md:col-start-8 lg:col-start-10 xl:col-start-11 flex flex-col items-end order-1 md:order-2 ts-body"
+        >
+          {/* Titres des projets et numéro */}
+          <div class="flex flex-col items-end gap-[1rem] w-full">
+            <div
+              class="project-info flex items-start justify-between gap-[1rem] w-full"
+            >
+              <div class="project-title flex-1">
+                {homeData.projects[0].title || "Projet sans titre"}
+              </div>
+              <p class="project-counter ts-body">
+                01 / 0{homeData.projects.length}
+              </p>
+            </div>
+
+            {/* Bouton Discover */}
+            {
+              homeData.projects[0].slug && (
+                <a
+                  href={`/projects/${homeData.projects[0].slug}`}
+                  class="discover-btn flex items-center gap-[0.5rem]"
+                >
+                  <svg
+                    width="10"
+                    height="9"
+                    viewBox="0 0 10 9"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 0V5.5H9M9 5.5L6 2.5M9 5.5L6 8.5"
+                      stroke="#EAE8DE"
+                    />
+                  </svg>
+                  Discover
+                </a>
+              )
+            }
+          </div>
+
+          {/* Boutons de navigation */}
+          <div class="w-full mt-[1.5rem]">
+            <div class="flex items-center justify-between">
+              <button
+                class="carousel-btn carousel-btn-prev ts-body"
+                aria-label="Projet précédent"
+              >
+                Previous
+              </button>
+
+              <button
+                class="carousel-btn carousel-btn-next ts-body"
+                aria-label="Projet suivant"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          {/* Bouton All projects */}
+          <div class="mt-[1rem]">
+            <a
+              href="/projects"
+              class="all-projects-btn flex items-center gap-[1rem]"
+            >
+              All projects
+              <span class="w-[8px] h-[10px] bg-white"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapperProjects absolute inset-0 w-full m-auto">
+      <div class="absolute inset-0 w-full h-full bg-[#00000033]"></div>
+      {
+        homeData.projects[0].image && (
+          <img
+            src={homeData.projects[0].image}
+            alt={homeData.projects[0].title}
+            class="w-full h-full aspect-video object-cover"
+          />
+        )
+      }
     </div>
   </section>
 </MainLayout>

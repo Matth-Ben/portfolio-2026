@@ -16,11 +16,12 @@ import contactData from "../data/contact-data.json";
         </li>
       </ul>
     </nav>
-    <div class="relative w-full h-screen">
+    <div class="relative w-full h-full">
+      <div class="absolute inset-0 w-full h-full bg-[#00000033]"></div>
       <img
         src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
         alt="Chaillot"
-        class="w-full h-screen object-cover"
+        class="w-full h-full object-cover"
       />
     </div>
   </section>
@@ -32,13 +33,15 @@ import contactData from "../data/contact-data.json";
     <div class="grid grid-cols-12 gap-6">
       <div class="col-span-11 col-start-2 text-center">
         <div
-          class="flex items-center justify-center ts-body"
+          class="flex items-center justify-center gap-[8.6rem] ts-body"
           data-text-split="chars"
           data-text-animation="fade"
         >
           {
             contactData.info.contacts.map((rs, index) => (
-              <Fragment>{rs.label}</Fragment>
+              <a href={rs.link} target="_blank">
+                {rs.label}
+              </a>
             ))
           }
         </div>
@@ -63,14 +66,15 @@ import contactData from "../data/contact-data.json";
     </div>
     <div class="grid grid-cols-12 gap-6">
       <div class="col-span-3 col-start-6">
-        <p
+        <a
+          href={`mailto:${contactData.info.email}`}
           class="ts-little text-center"
           data-text-split="lines"
           data-text-animation="slideUp"
           data-text-trigger="load"
         >
           {contactData.info.email}
-        </p>
+        </a>
       </div>
     </div>
   </section>
