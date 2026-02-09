@@ -1,81 +1,54 @@
 {
-    "header": {
-        "title": "Mes Projets",
-        "subtitle": "Une sélection de mes réalisations récentes"
-    },
     "projects": [
         {
-            "title": "Portfolio Interactif",
-            "description": "Site portfolio avec transitions Barba.js et animations GSAP",
-            "tags": [
-                "Astro",
-                "GSAP",
-                "Barba.js"
-            ],
-            "gradient": "from-purple-500 to-pink-500",
-            "url": "/project/portfolio-interactif"
+            "title": "Le Théâtre Chaillot",
+            "slug": "chaillot",
+            "image": "/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
         },
         {
-            "title": "E-commerce Moderne",
-            "description": "Boutique en ligne avec expérience utilisateur premium",
-            "tags": [
-                "React",
-                "Next.js",
-                "Tailwind"
-            ],
-            "gradient": "from-blue-500 to-cyan-500",
-            "url": "/project/ecommerce-moderne"
+            "title": "La Maison de la Musique de Nanterre",
+            "slug": "mmn",
+            "image": "/images/mmn/4c1f8b62082f71522a953fd320b98f507884257a_00e7ba5f85.png"
         },
         {
-            "title": "Dashboard Analytics",
-            "description": "Interface de visualisation de données en temps réel",
-            "tags": [
-                "Vue.js",
-                "D3.js",
-                "WebGL"
-            ],
-            "gradient": "from-green-500 to-emerald-500",
-            "url": "/project/dashboard-analytics"
+            "title": "Margot Jollit",
+            "slug": "margot-jollit",
+            "image": "/images/margot/b2408c99c0ca5d53ad9d1107998b752bc0a4dc6a_422be1343e.jpg"
         },
         {
-            "title": "Application Mobile",
-            "description": "App mobile hybride avec animations natives",
-            "tags": [
-                "React Native",
-                "TypeScript"
-            ],
-            "gradient": "from-orange-500 to-red-500",
-            "url": "#"
+            "title": "IFCV",
+            "slug": "ifcv",
+            "image": "/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
         },
         {
-            "title": "Plateforme SaaS",
-            "description": "Solution B2B avec architecture micro-services",
-            "tags": [
-                "Node.js",
-                "PostgreSQL",
-                "Docker"
-            ],
-            "gradient": "from-indigo-500 to-purple-500",
-            "url": "#"
+            "title": "Transbordeur",
+            "slug": "transbordeur",
+            "image": "/images/mmn/4c1f8b62082f71522a953fd320b98f507884257a_00e7ba5f85.png"
         },
         {
-            "title": "Site Vitrine",
-            "description": "Landing page avec scroll parallax et animations 3D",
-            "tags": [
-                "Three.js",
-                "GSAP",
-                "WebGL"
-            ],
-            "gradient": "from-pink-500 to-rose-500",
-            "url": "#"
+            "title": "SGH",
+            "slug": "sgh",
+            "image": "/images/margot/b2408c99c0ca5d53ad9d1107998b752bc0a4dc6a_422be1343e.jpg"
+        },
+        {
+            "title": "Musée de la Plaisance",
+            "slug": "musee-plaisance",
+            "image": "/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
+        },
+        {
+            "title": "Rivière Drôme",
+            "slug": "riviere-drome",
+            "image": "/images/mmn/4c1f8b62082f71522a953fd320b98f507884257a_00e7ba5f85.png"
+        },
+        {
+            "title": "Étoile Paris",
+            "slug": "etoile-paris",
+            "image": "/images/margot/b2408c99c0ca5d53ad9d1107998b752bc0a4dc6a_422be1343e.jpg"
+        },
+        {
+            "title": "Aéroport de Lyon",
+            "slug": "aeroport-lyon",
+            "image": "/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
         }
-    ],
-    "cta": {
-        "title": "Vous avez un projet ?",
-        "subtitle": "Discutons de votre prochaine idée",
-        "button": {
-            "text": "Me contacter",
-            "link": "/contact"
-        }
-    }
+    ]
 }

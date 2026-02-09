@@ -85,3 +85,7 @@ h6 {
 [data-text-split] {
     min-height: 1em;
 }
+
+.wrapperProjects .project-item:not(.active) img {
+    filter: grayscale(100%);
+}

@@ -6,7 +6,7 @@ import projectsData from "../data/projects-data.json";
 <MainLayout title="Portfolio - Projets" namespace="projects">
   <!-- Hero Section -->
   <section
-    class="mainProjects absolute inset-0 w-full h-screen m-auto overflow-hidden"
+    class="mainProjects absolute inset-0 w-full h-screen m-auto overflow-hidden bg-black"
   >
     <div
       id="navigation-info"
@@ -20,55 +20,47 @@ import projectsData from "../data/projects-data.json";
         >
         </div>
       </div>
-      <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem]">
+      <div
+        class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem] pointer-events-none"
+      >
         <div
           class="col-span-8 md:col-span-7 order-2 md:order-1 max-md:flex max-md:justify-center max-md:items-end max-md:pb-[2rem]"
         >
-          <h1 class="ts-title text-center md:text-left">
+          <h1
+            class="ts-title text-center md:text-left text-white mix-blend-difference pointer-events-auto"
+          >
             Matthias benoit<br />
             French creative developer
           </h1>
         </div>
         <div
-          class="col-span-8 md:col-span-5 lg:col-span-3 xl:col-span-2 md:col-start-8 lg:col-start-10 xl:col-start-11 flex flex-col items-end order-1 md:order-2 ts-body"
+          class="col-span-8 md:col-span-5 lg:col-span-3 xl:col-span-2 md:col-start-8 lg:col-start-10 xl:col-start-11 flex flex-col items-end order-1 md:order-2 ts-body pointers-events-auto"
         >
           {/* Titres des projets et numéro */}
-          <div class="flex flex-col items-end gap-[1rem] w-full">
-            <!-- <div class="project-info flex items-start justify-between gap-[1rem] w-full">
-                      <div class="project-title flex-1">
-                          {projects[0].title || 'Projet sans titre'}
-                      </div>
-                      <p class="project-counter ts-body">
-                          01 / 0{projects.length}
-                      </p>
-                  </div> -->
-
-            <!-- {/* Bouton Discover */} -->
-            <!-- {projects[0].slug && (
-                      <a 
-                          href={`/projects/${projects[0].slug}`}
-                          class="discover-btn flex items-center gap-[0.5rem]"
-                      >
-                        <svg width="10" height="9" viewBox="0 0 10 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M1 0V5.5H9M9 5.5L6 2.5M9 5.5L6 8.5" stroke="#EAE8DE"/>
-                        </svg>
-                        Discover
-                      </a>
-                  )} -->
+          <div
+            class="flex flex-col items-end gap-[1rem] w-full pointer-events-auto"
+          >
+            <div
+              class="project-info flex items-start justify-end gap-[1rem] w-full text-right"
+            >
+              <div class="project-title flex-1 mix-blend-difference text-white">
+                {projectsData.projects[0].title || "Projet sans titre"}
+              </div>
+            </div>
           </div>
 
           {/* Boutons de navigation */}
-          <div class="w-full mt-[1.5rem]">
-            <div class="flex items-center justify-between">
+          <div class="w-full mt-[1.5rem] pointer-events-auto">
+            <div class="flex items-center justify-between text-white">
               <button
-                class="carousel-btn carousel-btn-prev ts-body"
+                class="carousel-btn carousel-btn-prev ts-body mix-blend-difference cursor-pointer"
                 aria-label="Projet précédent"
               >
                 Previous
               </button>
 
               <button
-                class="carousel-btn carousel-btn-next ts-body"
+                class="carousel-btn carousel-btn-next ts-body mix-blend-difference cursor-pointer"
                 aria-label="Projet suivant"
               >
                 Next
@@ -76,10 +68,10 @@ import projectsData from "../data/projects-data.json";
             </div>
           </div>
 
-          <div class="mt-[1rem]">
+          <div class="mt-[1rem] pointer-events-auto">
             <a
               href="/"
-              class="ts-little flex items-center justify-center gap-[1rem]"
+              class="ts-little flex items-center justify-center gap-[1rem] text-white mix-blend-difference"
             >
               Close
               <span class="w-[8px] h-[10px] bg-white"></span>
@@ -89,24 +81,227 @@ import projectsData from "../data/projects-data.json";
       </div>
     </div>
 
-    <div class="wrapperProjects absolute inset-0 w-full h-full m-auto">
-      <div class="flex items-center justify-center gap-16 h-full">
-        <img
-          src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
-          alt="Chaillot"
-          class="imageWrappered w-[69rem] aspect-video object-cover"
-        />
-        <img
-          src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
-          alt="Chaillot"
-          class="imageWrappered w-[69rem] aspect-video object-cover active"
-        />
-        <img
-          src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
-          alt="Chaillot"
-          class="imageWrappered w-[69rem] aspect-video object-cover"
-        />
+    <div
+      class="wrapperProjects absolute inset-0 w-full h-full m-auto flex items-center"
+    >
+      <div
+        class="relative w-full h-full flex items-center justify-center"
+        id="carousel-track"
+      >
+        {
+          projectsData.projects.map((project, index) => (
+            <div
+              class="project-item absolute top-1/2 -translate-y-1/2"
+              data-index={index}
+            >
+              <div class="relative">
+                <div class="absolute inset-0 bg-[#00000033]" />
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  class={`block w-[69rem] aspect-video object-cover`}
+                />
+              </div>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
 </MainLayout>
+
+<script>
+  import gsap from "gsap";
+
+  class InfiniteCarousel {
+    track: HTMLElement | null;
+    items: NodeListOf<HTMLElement>;
+    prevBtn: HTMLElement | null;
+    nextBtn: HTMLElement | null;
+    titleEl: HTMLElement | null;
+    itemWidth: number = 0;
+    gap: number = 0;
+    spacing: number = 0;
+    totalWidth: number = 0;
+    progress: number = 0;
+    targetProgress: number = 0;
+    snapTimeout: number = 0;
+
+    constructor() {
+      this.track = document.querySelector("#carousel-track");
+      this.items = document.querySelectorAll(".project-item");
+      this.prevBtn = document.querySelector(".carousel-btn-prev");
+      this.nextBtn = document.querySelector(".carousel-btn-next");
+      this.titleEl = document.querySelector(".project-title");
+
+      if (!this.track || !this.items.length) return;
+
+      this.init();
+    }
+
+    init() {
+      // Calculate dimensions
+      const rem = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+      this.itemWidth = 69 * rem;
+      this.gap = 4 * rem;
+      this.spacing = this.itemWidth + this.gap;
+      this.totalWidth = this.items.length * this.spacing;
+
+      this.render(); // Initial render to position items
+
+      this.prevBtn?.addEventListener("click", () => this.snapMove("prev"));
+      this.nextBtn?.addEventListener("click", () => this.snapMove("next"));
+
+      window.addEventListener("resize", () => this.onResize());
+      window.addEventListener("wheel", (e) => this.onWheel(e), {
+        passive: false,
+      });
+
+      gsap.ticker.add(() => this.tick());
+
+      this.snap();
+    }
+
+    onResize() {
+      const rem = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+      this.itemWidth = 69 * rem;
+      this.gap = 4 * rem;
+      this.spacing = this.itemWidth + this.gap;
+      this.totalWidth = this.items.length * this.spacing;
+    }
+
+    onWheel(e: WheelEvent) {
+      // Horizontal scroll via vertical wheel
+      const delta = e.deltaY;
+      this.targetProgress -= delta * 0.5; // Adjust speed factor here
+
+      this.clearActiveClasses();
+
+      // Clear existing timeout
+      window.clearTimeout(this.snapTimeout);
+
+      // Set new timeout to snap after scroll stops
+      this.snapTimeout = window.setTimeout(() => {
+        this.snap();
+      }, 200);
+    }
+
+    snap() {
+      // Snap targetProgress to nearest spacing multiple
+      const raw = this.targetProgress / this.spacing;
+      const snapped = Math.round(raw) * this.spacing;
+      this.targetProgress = snapped;
+    }
+
+    clearActiveClasses() {
+      this.items.forEach((item) => {
+        item.classList.remove("active");
+        const img = item.querySelector("img");
+        if (img) img.classList.remove("active");
+      });
+    }
+
+    snapMove(direction: string) {
+      const dir = direction === "next" ? -1 : 1;
+
+      this.clearActiveClasses();
+
+      const currentSnap = Math.round(this.targetProgress / this.spacing);
+      this.targetProgress = (currentSnap + dir) * this.spacing;
+
+      window.clearTimeout(this.snapTimeout);
+      this.snapTimeout = window.setTimeout(() => {
+        this.snap();
+      }, 700); // Wait a bit before verifying snap
+    }
+
+    tick() {
+      // Lerp
+      // We check if we are close enough to stop
+      if (Math.abs(this.targetProgress - this.progress) < 0.01) {
+        this.progress = this.targetProgress;
+        this.render();
+        // We are settled. Check if we need to set active class.
+        // We can just try to set it every time we are settled.
+        this.updateActiveItem();
+      } else {
+        this.progress += (this.targetProgress - this.progress) * 0.1;
+        this.render();
+      }
+    }
+
+    updateActiveItem() {
+      // Don't re-apply if already active?
+      // It's cheap to just add class if missing or strictly find closest.
+
+      const halfWidth = this.totalWidth / 2;
+      const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+      let closestItem: HTMLElement | null = null;
+      let minDist = Infinity;
+
+      this.items.forEach((item) => {
+        // Current position based on final progress (which is targetProgress now)
+        const index = parseInt(item.getAttribute("data-index") || "0");
+        const initialPos = index * this.spacing;
+        const currentPos = initialPos + this.progress;
+        const wrappedPos = wrapFn(currentPos);
+
+        if (Math.abs(wrappedPos) < minDist) {
+          minDist = Math.abs(wrappedPos);
+          closestItem = item;
+        }
+      });
+
+      // Only one active at a time, clear others to be safe or just add to closest?
+      // User wants clear during scroll, so we assume others are cleared.
+      // But let's be robust.
+
+      if (
+        closestItem &&
+        !(closestItem as HTMLElement).classList.contains("active")
+      ) {
+        this.clearActiveClasses();
+        (closestItem as HTMLElement).classList.add("active");
+        const img = (closestItem as HTMLElement).querySelector("img");
+        if (img) img.classList.add("active");
+      }
+    }
+
+    render() {
+      const halfWidth = this.totalWidth / 2;
+      const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+      this.items.forEach((item, i) => {
+        // Initial static position based on index
+        const initialPos = i * this.spacing;
+        // Apply scroll movement
+        const currentPos = initialPos + this.progress;
+        // Wrap
+        const wrappedPos = wrapFn(currentPos);
+
+        gsap.set(item, {
+          x: wrappedPos,
+          xPercent: -50,
+          left: "50%",
+        });
+      });
+    }
+  }
+
+  const init = () => {
+    new InfiniteCarousel();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  document.addEventListener("astro:page-load", init);
+</script>
