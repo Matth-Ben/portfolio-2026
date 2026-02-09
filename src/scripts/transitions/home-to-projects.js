@@ -21,10 +21,19 @@ export default {
     to: { namespace: ['projects'] },
 
     async leave(data) {
+        const navLinks = document.querySelectorAll('.transition-link');
         const wrapperProjects = document.querySelector('.wrapperProjects');
         const allProjects = document.querySelector('.all-projects-btn');
 
         cleanupScrollTriggers();
+
+        gsap.to(navLinks, {
+            opacity: 0,
+            yPercent: 100,
+            duration: 0.3,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
 
         gsap.to(allProjects, {
             opacity: 0,

@@ -8,23 +8,6 @@ import projectsData from "../data/projects-data.json";
   <section
     class="mainProjects absolute inset-0 w-full h-screen m-auto overflow-hidden"
   >
-    <nav
-      class="absolute top-1/2 left-0 right-0 z-10 px-[1rem] md:px-[2rem] -translate-y-full pb-[2rem]"
-    >
-      <ul class="flex items-center justify-between w-full">
-        <li>
-          <a class="ts-little transition-link block" href="/about" data-barba
-            >About</a
-          >
-        </li>
-        <li>
-          <a class="ts-little transition-link block" href="/contact" data-barba
-            >Contact</a
-          >
-        </li>
-      </ul>
-    </nav>
-
     <div
       id="navigation-info"
       class="absolute top-1/2 left-0 right-0 z-10 max-md:h-1/2 px-[1rem] md:px-[2rem]"
@@ -92,14 +75,18 @@ import projectsData from "../data/projects-data.json";
               </button>
             </div>
           </div>
+
+          <div class="mt-[1rem]">
+            <a
+              href="/"
+              class="ts-little flex items-center justify-center gap-[1rem]"
+            >
+              Close
+              <span class="w-[8px] h-[10px] bg-white"></span>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="absolute bottom-8 left-0 right-0 z-10 mx-auto">
-      <a href="/" class="ts-little flex items-center justify-center gap-[1rem]">
-        Close
-      </a>
     </div>
 
     <div class="wrapperProjects absolute inset-0 w-full h-full m-auto">
