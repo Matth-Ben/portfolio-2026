@@ -20,9 +20,7 @@ import projectsData from "../data/projects-data.json";
         >
         </div>
       </div>
-      <div
-        class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem] pointer-events-none"
-      >
+      <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem]">
         <div
           class="col-span-8 md:col-span-7 order-2 md:order-1 max-md:flex max-md:justify-center max-md:items-end max-md:pb-[2rem]"
         >
@@ -37,16 +35,41 @@ import projectsData from "../data/projects-data.json";
           class="col-span-8 md:col-span-5 lg:col-span-3 xl:col-span-2 md:col-start-8 lg:col-start-10 xl:col-start-11 flex flex-col items-end order-1 md:order-2 ts-body pointers-events-auto"
         >
           {/* Titres des projets et numéro */}
-          <div
-            class="flex flex-col items-end gap-[1rem] w-full pointer-events-auto"
-          >
+          <div class="flex flex-col items-end gap-[1rem] w-full">
             <div
-              class="project-info flex items-start justify-end gap-[1rem] w-full text-right"
+              class="project-info flex items-start justify-between gap-[1rem] w-full"
             >
-              <div class="project-title flex-1 mix-blend-difference text-white">
+              <div class="project-title flex-1">
                 {projectsData.projects[0].title || "Projet sans titre"}
               </div>
+              <p class="project-counter ts-body">
+                01 / {projectsData.projects.length.toString().padStart(2, "0")}
+              </p>
             </div>
+
+            {/* Bouton Discover */}
+            {
+              projectsData.projects[0].slug && (
+                <a
+                  href={`/projects/${projectsData.projects[0].slug}`}
+                  class="discover-btn flex items-center gap-[0.5rem]"
+                >
+                  <svg
+                    width="10"
+                    height="9"
+                    viewBox="0 0 10 9"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 0V5.5H9M9 5.5L6 2.5M9 5.5L6 8.5"
+                      stroke="#EAE8DE"
+                    />
+                  </svg>
+                  Discover
+                </a>
+              )
+            }
           </div>
 
           {/* Boutons de navigation */}
@@ -93,14 +116,18 @@ import projectsData from "../data/projects-data.json";
             <div
               class="project-item absolute top-1/2 -translate-y-1/2"
               data-index={index}
+              data-title={project.title}
+              data-slug={project.slug}
             >
-              <div class="relative">
-                <div class="absolute inset-0 bg-[#00000033]" />
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  class={`block w-[69rem] aspect-video object-cover`}
-                />
+              <div class="project-item--container">
+                <div class="relative">
+                  <div class="absolute inset-0 bg-[#00000033]" />
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    class={`block w-full aspect-video object-cover`}
+                  />
+                </div>
               </div>
             </div>
           ))
@@ -119,6 +146,8 @@ import projectsData from "../data/projects-data.json";
     prevBtn: HTMLElement | null;
     nextBtn: HTMLElement | null;
     titleEl: HTMLElement | null;
+    counterEl: HTMLElement | null;
+    discoverBtn: HTMLElement | null;
     itemWidth: number = 0;
     gap: number = 0;
     spacing: number = 0;
@@ -133,6 +162,8 @@ import projectsData from "../data/projects-data.json";
       this.prevBtn = document.querySelector(".carousel-btn-prev");
       this.nextBtn = document.querySelector(".carousel-btn-next");
       this.titleEl = document.querySelector(".project-title");
+      this.counterEl = document.querySelector(".project-counter");
+      this.discoverBtn = document.querySelector(".discover-btn");
 
       if (!this.track || !this.items.length) return;
 
@@ -150,6 +181,12 @@ import projectsData from "../data/projects-data.json";
       this.totalWidth = this.items.length * this.spacing;
 
       this.render(); // Initial render to position items
+
+      // Initialize project info with first item
+      const firstItem = this.items[0];
+      if (firstItem) {
+        this.updateProjectInfo(firstItem);
+      }
 
       this.prevBtn?.addEventListener("click", () => this.snapMove("prev"));
       this.nextBtn?.addEventListener("click", () => this.snapMove("next"));
@@ -187,7 +224,7 @@ import projectsData from "../data/projects-data.json";
       // Set new timeout to snap after scroll stops
       this.snapTimeout = window.setTimeout(() => {
         this.snap();
-      }, 200);
+      }, 50);
     }
 
     snap() {
@@ -213,23 +250,32 @@ import projectsData from "../data/projects-data.json";
       const currentSnap = Math.round(this.targetProgress / this.spacing);
       this.targetProgress = (currentSnap + dir) * this.spacing;
 
+      // Calculate which item will be active after the move
+      const nextIndex =
+        Math.abs(Math.round(this.targetProgress / this.spacing)) %
+        this.items.length;
+      const nextItem = this.items[nextIndex];
+      if (nextItem) {
+        this.updateProjectInfo(nextItem);
+      }
+
       window.clearTimeout(this.snapTimeout);
       this.snapTimeout = window.setTimeout(() => {
         this.snap();
-      }, 700); // Wait a bit before verifying snap
+      }, 100); // Wait a bit before verifying snap
     }
 
     tick() {
       // Lerp
       // We check if we are close enough to stop
-      if (Math.abs(this.targetProgress - this.progress) < 0.01) {
+      if (Math.abs(this.targetProgress - this.progress) < 0.5) {
         this.progress = this.targetProgress;
         this.render();
         // We are settled. Check if we need to set active class.
         // We can just try to set it every time we are settled.
         this.updateActiveItem();
       } else {
-        this.progress += (this.targetProgress - this.progress) * 0.1;
+        this.progress += (this.targetProgress - this.progress) * 0.2;
         this.render();
       }
     }
@@ -269,12 +315,43 @@ import projectsData from "../data/projects-data.json";
         (closestItem as HTMLElement).classList.add("active");
         const img = (closestItem as HTMLElement).querySelector("img");
         if (img) img.classList.add("active");
+
+        // Update project info
+        this.updateProjectInfo(closestItem as HTMLElement);
+      }
+    }
+
+    updateProjectInfo(activeItem: HTMLElement) {
+      const title = activeItem.getAttribute("data-title");
+      const slug = activeItem.getAttribute("data-slug");
+      const index = parseInt(activeItem.getAttribute("data-index") || "0");
+      const totalProjects = this.items.length;
+
+      // Update title
+      if (this.titleEl && title) {
+        this.titleEl.textContent = title;
+      }
+
+      // Update counter
+      if (this.counterEl) {
+        const currentNum = (index + 1).toString().padStart(2, "0");
+        const totalNum = totalProjects.toString().padStart(2, "0");
+        this.counterEl.textContent = `${currentNum} / ${totalNum}`;
+      }
+
+      // Update discover button
+      if (this.discoverBtn && slug) {
+        this.discoverBtn.setAttribute("href", `/projects/${slug}`);
       }
     }
 
     render() {
       const halfWidth = this.totalWidth / 2;
       const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+      // Calculate velocity
+      const velocity = this.targetProgress - this.progress;
+      const skew = velocity * 0.01; // Adjust multiplier for sensitivity
 
       this.items.forEach((item, i) => {
         // Initial static position based on index
@@ -289,6 +366,14 @@ import projectsData from "../data/projects-data.json";
           xPercent: -50,
           left: "50%",
         });
+
+        // Apply skew to container
+        const container = item.querySelector(".project-item--container");
+        if (container) {
+          gsap.set(container, {
+            skewX: skew,
+          });
+        }
       });
     }
   }
