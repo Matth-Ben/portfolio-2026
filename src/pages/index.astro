@@ -108,19 +108,21 @@ import homeData from "../data/home-data.json";
 
           {/* Bouton All projects */}
           <div class="mt-[1rem]">
-            <a
-              href="/projects"
-              class="all-projects-btn flex items-center gap-[1rem]"
+            <button
+              class="all-projects-btn flex items-center gap-[1rem] ts-little"
             >
               All projects
               <span class="w-[8px] h-[10px] bg-white"></span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="wrapperProjects absolute inset-0 w-full m-auto">
+    <div
+      class="wrapperProjects absolute inset-0 w-full m-auto"
+      data-projects={JSON.stringify(homeData.projects)}
+    >
       <div class="absolute inset-0 w-full h-full bg-[#00000033]"></div>
       {
         homeData.projects[0].image && (
@@ -134,3 +136,7 @@ import homeData from "../data/home-data.json";
     </div>
   </section>
 </MainLayout>
+
+<script>
+  import "../scripts/home-slider.js";
+</script>

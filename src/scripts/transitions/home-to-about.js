@@ -16,8 +16,23 @@ export default {
     async leave(data) {
         const navLinks = document.querySelectorAll('.transition-link');
         const mainHome = document.querySelector('.mainHome');
+        const wrapperProjects = document.querySelector('.wrapperProjects');
 
         cleanupScrollTriggers();
+
+        // Ensure wrapper is in correct state for transition
+        // If in carousel mode, first animate back to full width
+        const savedState = sessionStorage.getItem('homeSliderState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            if (state.mode === 'carousel' && wrapperProjects) {
+                await gsap.to(wrapperProjects, {
+                    width: '100%',
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            }
+        }
 
         await gsap.to(navLinks, {
             opacity: 0,

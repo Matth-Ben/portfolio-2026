@@ -97,3 +97,38 @@ h6 {
     filter: grayscale(100%);
     opacity: 0.4;
 }
+
+/* Home page carousel mode */
+.mainHome .wrapperProjects .project-item {
+    pointer-events: none;
+}
+
+.mainHome .wrapperProjects .project-item--container {
+    width: 69rem;
+    max-width: 90vw;
+}
+
+/* Button styles */
+.all-projects-btn {
+    background: transparent;
+    border: none;
+    color: #EAE8DE;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.all-projects-btn:hover {
+    opacity: 0.7;
+}
+
+.carousel-btn {
+    background: transparent;
+    border: none;
+    color: #EAE8DE;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.carousel-btn:hover {
+    opacity: 0.7;
+}
