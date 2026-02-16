@@ -123,20 +123,28 @@ import homeData from "../data/home-data.json";
       class="wrapperProjects absolute inset-0 w-full m-auto"
       data-projects={JSON.stringify(homeData.projects)}
     >
-      <div class="absolute inset-0 w-full h-full bg-[#00000033]"></div>
       {
-        homeData.projects[0].image && (
-          <img
-            src={homeData.projects[0].image}
-            alt={homeData.projects[0].title}
-            class="w-full h-full aspect-video object-cover"
-          />
-        )
+        homeData.projects.map((project, index) => (
+          <div
+            class="slider-slide absolute inset-0 w-full h-full"
+            data-index={index}
+            data-slug={project.slug}
+          >
+            <div class="slider-slide__mask absolute inset-0 w-full h-full overflow-hidden">
+              <img
+                src={project.image}
+                alt={project.title}
+                class="w-full h-full object-cover"
+              />
+              <div class="slider-slide__overlay absolute inset-0 w-full h-full bg-[#00000033]" />
+            </div>
+          </div>
+        ))
       }
     </div>
   </section>
 </MainLayout>
-<!-- 
+
 <script>
   import "../scripts/home-slider.js";
-</script> -->
+</script>
