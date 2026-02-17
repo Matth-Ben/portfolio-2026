@@ -132,3 +132,54 @@ h6 {
 .carousel-btn:hover {
     opacity: 0.7;
 }
+
+/* ==========================================
+   Carousel Mode (toggle via all-projects-btn)
+   ========================================== */
+
+.wrapperProjects.carousel-mode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.wrapperProjects.carousel-mode .slider-slide {
+    position: relative;
+    inset: auto;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 0.4rem;
+    transition: width 0.5s ease, height 0.5s ease, opacity 0.5s ease;
+}
+
+.wrapperProjects.carousel-mode .slider-slide.carousel-active {
+    width: 35vw;
+    height: 60vh;
+    opacity: 1;
+}
+
+.wrapperProjects.carousel-mode .slider-slide.carousel-prev,
+.wrapperProjects.carousel-mode .slider-slide.carousel-next {
+    width: 25vw;
+    height: 45vh;
+    opacity: 0.6;
+}
+
+.wrapperProjects.carousel-mode .slider-slide.carousel-hidden {
+    display: none;
+}
+
+.wrapperProjects.carousel-mode .slider-slide__mask {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.wrapperProjects.carousel-mode .slider-slide__mask img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
