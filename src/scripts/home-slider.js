@@ -2,8 +2,8 @@ import gsap from 'gsap';
 
 const SLIDER_STATE_KEY = 'homeSliderState';
 
-function saveSliderState(index, mode = 'slider') {
-    sessionStorage.setItem(SLIDER_STATE_KEY, JSON.stringify({ index, mode }));
+function saveSliderState(index, mode = 'slider', image = null) {
+    sessionStorage.setItem(SLIDER_STATE_KEY, JSON.stringify({ index, mode, image }));
 }
 
 function getSliderState() {
@@ -13,12 +13,10 @@ function getSliderState() {
 
 /**
  * HomeSlider - Slider on the home page.
- * All images are pre-rendered in the DOM, each with its own mask (.slider-slide__mask).
- * Navigation animates slides via xPercent on the mask and counter-translates the image.
  *
- * Supports two modes:
- * - "slider": fullscreen slider with mask reveal transitions
- * - "carousel": 3-item carousel (prev, active, next) with the active item centered
+ * Two modes:
+ * - "slider": fullscreen with mask reveal transitions
+ * - "carousel": infinite carousel with progress-based positioning (like projects page)
  */
 class HomeSlider {
     constructor() {
@@ -34,7 +32,20 @@ class HomeSlider {
         this.currentIndex = 0;
         this.projects = [];
         this.isAnimating = false;
-        this.mode = 'slider'; // 'slider' or 'carousel'
+        this.mode = 'slider';
+
+        // Carousel engine state
+        this.carouselProgress = 0;
+        this.carouselTargetProgress = 0;
+        this.carouselItemWidth = 0;
+        this.carouselGap = 0;
+        this.carouselSpacing = 0;
+        this.carouselTotalWidth = 0;
+        this.carouselTickerActive = false;
+        this.carouselSnapTimeout = 0;
+        this._boundTick = this._carouselTick.bind(this);
+        this._boundWheel = this._onCarouselWheel.bind(this);
+        this._boundResize = this._onCarouselResize.bind(this);
 
         if (!this.wrapper || this.slides.length === 0) return;
 
@@ -63,6 +74,7 @@ class HomeSlider {
 
         // Update info to match current slide
         this.updateProjectInfo(this.currentIndex);
+        saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
 
         // Bind navigation
         this.onPrev = () => this.navigate('prev');
@@ -94,7 +106,7 @@ class HomeSlider {
         if (this.isAnimating) return;
 
         if (this.mode === 'carousel') {
-            this.navigateCarousel(direction);
+            this._carouselSnapMove(direction);
             return;
         }
 
@@ -108,9 +120,6 @@ class HomeSlider {
         this.showSlide(this.currentIndex, prevIndex, direction);
     }
 
-    /**
-     * Animate from prevIndex to nextIndex (slider mode).
-     */
     showSlide(nextIndex, prevIndex, direction) {
         this.isAnimating = true;
 
@@ -123,24 +132,21 @@ class HomeSlider {
         const exit = -enter;
 
         this.updateProjectInfo(nextIndex);
-        saveSliderState(nextIndex, this.mode);
+        saveSliderState(nextIndex, this.mode, this._getActiveImage(nextIndex));
 
         const tl = gsap.timeline({
             defaults: { duration: 0.6, ease: 'power2.inOut' },
             onComplete: () => { this.isAnimating = false; },
         });
 
-        // Incoming slide
         tl.fromTo(nextMask, { xPercent: enter }, { xPercent: 0 }, 0);
         tl.fromTo(nextImg, { xPercent: -enter }, { xPercent: 0 }, 0);
-
-        // Outgoing slide
         tl.fromTo(prevMask, { xPercent: 0 }, { xPercent: exit }, 0);
         tl.fromTo(prevImg, { xPercent: 0 }, { xPercent: -exit }, 0);
     }
 
     // ==========================================
-    // Carousel Mode
+    // Carousel Mode Toggle
     // ==========================================
 
     toggleCarousel() {
@@ -155,299 +161,422 @@ class HomeSlider {
 
     /**
      * Transition: Slider → Carousel
-     * 1. Center the active slide and shrink it
-     * 2. Switch to carousel layout (flex)
-     * 3. Fade in prev/next slides
+     * 1. Shrink active slide to center (using margin: auto trick)
+     * 2. Switch to carousel engine (progress-based positioning)
      */
     _transitionToCarousel() {
         this.isAnimating = true;
-        const total = this.projects.length;
         const activeSlide = this.slides[this.currentIndex];
         const activeMask = activeSlide?.querySelector('.slider-slide__mask');
         const activeImg = activeMask?.querySelector('img');
 
-        const prevIdx = (this.currentIndex - 1 + total) % total;
-        const nextIdx = (this.currentIndex + 1) % total;
-        const prevSlide = this.slides[prevIdx];
-        const nextSlide = this.slides[nextIdx];
-
         const tl = gsap.timeline();
 
-        // Step 1: Shrink the active slide while keeping it centered.
-        // The slide is `position: absolute; inset: 0` which fills the parent.
-        // By adding `margin: auto`, the remaining space is distributed equally
-        // on all sides, keeping the element perfectly centered as it shrinks.
+        // Step 1: Shrink active slide while keeping it centered
         gsap.set(activeSlide, { margin: 'auto' });
 
         tl.to(activeSlide, {
-            width: '35vw',
-            height: '60vh',
+            width: '690px',
+            height: '432px',
             borderRadius: '0.4rem',
             duration: 0.7,
             ease: 'power2.inOut',
         }, 0);
 
-        // Reset mask transforms to neutral
-        tl.to(activeMask, {
-            xPercent: 0,
-            duration: 0.7,
-            ease: 'power2.inOut',
-        }, 0);
+        tl.to(activeMask, { xPercent: 0, duration: 0.7, ease: 'power2.inOut' }, 0);
+        tl.to(activeImg, { xPercent: 0, duration: 0.7, ease: 'power2.inOut' }, 0);
 
-        tl.to(activeImg, {
-            xPercent: 0,
-            duration: 0.7,
-            ease: 'power2.inOut',
-        }, 0);
+        // We need to store data computed inside the callback for step 3
+        const entranceData = [];
 
-        // Step 2: After shrink, switch to flex carousel layout
+        // Step 2: Switch to carousel positioning (but ticker not started yet)
         tl.call(() => {
-            // 1. Pre-hide prev/next to prevent any flash
-            gsap.set(prevSlide, { opacity: 0, visibility: 'hidden' });
-            gsap.set(nextSlide, { opacity: 0, visibility: 'hidden' });
+            // Pre-hide ALL non-active slides before any layout change
+            this.slides.forEach((slide, i) => {
+                if (i !== this.currentIndex) {
+                    gsap.set(slide, { visibility: 'hidden', opacity: 0 });
+                }
+            });
 
-            // 2. Reset all slide masks to neutral position
+            // Clear margin/borderRadius from shrink animation
+            gsap.set(activeSlide, { clearProps: 'margin,borderRadius,inset' });
+
+            // Switch to carousel mode layout
+            this.wrapper.classList.add('carousel-mode');
+
+            // Calculate carousel dimensions
+            this._calculateCarouselDimensions();
+
+            // Set progress so current item is centered
+            this.carouselProgress = -this.currentIndex * this.carouselSpacing;
+            this.carouselTargetProgress = this.carouselProgress;
+
+            // Position ONLY the active slide via carousel engine
+            const halfWidth = this.carouselTotalWidth / 2;
+            const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+            // Position active slide at center
+            const activePos = wrapFn(this.currentIndex * this.carouselSpacing + this.carouselProgress);
+            gsap.set(activeSlide, {
+                x: activePos,
+                xPercent: -50,
+                left: '50%',
+                top: '50%',
+                yPercent: -50,
+                position: 'absolute',
+                width: `${this.carouselItemWidth}px`,
+                height: '432px',
+                scale: 1,
+                opacity: 1,
+                borderRadius: '0.4rem',
+                overflow: 'hidden',
+                zIndex: 10,
+            });
+
+            // Prepare non-active slides: compute final positions + offset
+            this.slides.forEach((slide, i) => {
+                if (i !== this.currentIndex) {
+                    const initialPos = i * this.carouselSpacing;
+                    const wrappedPos = wrapFn(initialPos + this.carouselProgress);
+                    const offsetX = wrappedPos >= 0 ? 150 : -150;
+                    const distFromCenter = Math.abs(wrappedPos);
+                    const maxDist = this.carouselSpacing * 2;
+                    const normalizedDist = Math.min(distFromCenter / maxDist, 1);
+                    const scale = gsap.utils.interpolate(1, 0.8, normalizedDist);
+                    const itemOpacity = gsap.utils.interpolate(1, 0.5, normalizedDist);
+
+                    // Set initial state: offset outward, transparent
+                    gsap.set(slide, {
+                        visibility: 'visible',
+                        opacity: 0,
+                        x: wrappedPos + offsetX,
+                        xPercent: -50,
+                        left: '50%',
+                        top: '50%',
+                        yPercent: -50,
+                        position: 'absolute',
+                        width: `${this.carouselItemWidth}px`,
+                        height: '432px',
+                        scale: scale,
+                        borderRadius: '0.4rem',
+                        overflow: 'hidden',
+                        zIndex: Math.round((1 - normalizedDist) * 10),
+                    });
+
+                    // Store target values for the animation
+                    entranceData.push({
+                        slide,
+                        targetX: wrappedPos,
+                        targetOpacity: itemOpacity,
+                    });
+                }
+            });
+
+            // Reset masks for carousel display
             this.slides.forEach((slide) => {
                 const mask = slide.querySelector('.slider-slide__mask');
                 const img = mask?.querySelector('img');
-                gsap.set(mask, { xPercent: 0 });
+                gsap.set(mask, { xPercent: 0, position: 'relative', inset: 'auto', width: '100%', height: '100%' });
                 gsap.set(img, { xPercent: 0 });
             });
-
-            // 3. Switch to carousel layout + apply classes
-            //    CSS carousel-active now defines width: 35vw, height: 60vh
-            this.wrapper.classList.add('carousel-mode');
-            this._applyCarouselClasses();
-
-            // 4. Disable CSS transitions to prevent re-animation
-            //    when we clear GSAP inline styles below
-            this.slides.forEach(s => s.style.transition = 'none');
-
-            // 5. Clear GSAP inline styles — CSS classes now handle sizing
-            //    Without this, GSAP inline overrides would conflict with CSS
-            gsap.set(activeSlide, { clearProps: 'all' });
-            gsap.set(activeMask, { clearProps: 'all' });
-            gsap.set(activeImg, { clearProps: 'all' });
-
-            // 6. Force browser reflow so cleared styles are applied instantly
-            void this.wrapper.offsetHeight;
-
-            // 7. Re-enable CSS transitions
-            this.slides.forEach(s => s.style.transition = '');
-
-            // 8. Prepare prev/next for fade-in (visible but transparent)
-            gsap.set(prevSlide, { visibility: 'visible', opacity: 0 });
-            gsap.set(nextSlide, { visibility: 'visible', opacity: 0 });
         });
 
-        // Step 3: Fade in prev/next
-        tl.to([prevSlide, nextSlide], {
-            opacity: 1,
-            duration: 0.5,
-            ease: 'power2.out',
-            stagger: 0.05,
-            onComplete: () => {
-                // Let CSS handle opacity via the carousel classes
-                gsap.set([prevSlide, nextSlide], { clearProps: 'opacity' });
-                this.isAnimating = false;
-                this.mode = 'carousel';
-                saveSliderState(this.currentIndex, this.mode);
-            },
+        // Step 3: Fade in + slide inward (NO ticker running, so nothing overwrites)
+        tl.call(() => {
+            entranceData.forEach((data, idx) => {
+                gsap.to(data.slide, {
+                    opacity: data.targetOpacity,
+                    x: data.targetX,
+                    duration: 0.6,
+                    ease: 'power2.out',
+                    delay: idx * 0.03,
+                });
+            });
         });
+
+        // Step 4: After entrance animation, start the ticker
+        tl.call(() => {
+            this._carouselRender();
+            this._startCarouselTicker();
+            this.isAnimating = false;
+            this.mode = 'carousel';
+            saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
+        }, null, `+=${0.6 + entranceData.length * 0.03 + 0.1}`);
     }
 
     /**
      * Transition: Carousel → Slider
-     * 1. Fade out prev/next
-     * 2. Expand active slide to fullscreen
+     * 1. Fade out non-active slides
+     * 2. Expand active back to fullscreen
      */
     _transitionToSlider() {
         this.isAnimating = true;
-        const total = this.projects.length;
-        const prevIdx = (this.currentIndex - 1 + total) % total;
-        const nextIdx = (this.currentIndex + 1) % total;
-        const prevSlide = this.slides[prevIdx];
-        const nextSlide = this.slides[nextIdx];
         const activeSlide = this.slides[this.currentIndex];
+        const activeMask = activeSlide?.querySelector('.slider-slide__mask');
+        const activeImg = activeMask?.querySelector('img');
+
+        // Stop the carousel ticker FIRST so _carouselRender() doesn't overwrite animations
+        this._stopCarouselTicker();
 
         const tl = gsap.timeline();
 
-        // Step 1: Fade out prev/next
-        tl.to([prevSlide, nextSlide], {
-            opacity: 0,
-            duration: 0.35,
-            ease: 'power2.in',
+        // Step 1: Fade out + slide outward all non-active slides
+        const nonActiveSlides = Array.from(this.slides).filter((_, i) => i !== this.currentIndex);
+
+        const halfWidth = this.carouselTotalWidth / 2;
+        const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+        nonActiveSlides.forEach((slide) => {
+            const i = Array.from(this.slides).indexOf(slide);
+            const initialPos = i * this.carouselSpacing;
+            const wrappedPos = wrapFn(initialPos + this.carouselProgress);
+            const offsetX = wrappedPos >= 0 ? 150 : -150;
+
+            tl.to(slide, {
+                opacity: 0,
+                x: wrappedPos + offsetX,
+                duration: 0.4,
+                ease: 'power2.in',
+            }, 0);
         });
 
-        // Step 2: Remove carousel mode, switch back to slider layout
+        // Step 2: Prepare active slide for expansion
         tl.call(() => {
+
+            // Hide non-active slides
+            nonActiveSlides.forEach(slide => {
+                gsap.set(slide, { visibility: 'hidden' });
+            });
+
+            // Remove carousel-mode so the wrapper is back to normal
             this.wrapper.classList.remove('carousel-mode');
-            this._removeCarouselClasses();
 
-            // Clear all inline styles
-            this.slides.forEach((slide) => {
-                gsap.set(slide, { clearProps: 'all' });
-                const mask = slide.querySelector('.slider-slide__mask');
-                const img = mask?.querySelector('img');
-                gsap.set(mask, { clearProps: 'all' });
-                gsap.set(img, { clearProps: 'all' });
+            // Set active slide to absolute centered with its current carousel size
+            // Using inset:0 + margin:auto for perfect centering during expand
+            gsap.set(activeSlide, {
+                clearProps: 'x,xPercent,yPercent,left,top,scale,zIndex',
+            });
+            gsap.set(activeSlide, {
+                position: 'absolute',
+                inset: 0,
+                margin: 'auto',
+                width: '690px',
+                height: '432px',
+                borderRadius: '0.4rem',
+                overflow: 'hidden',
             });
 
-            // Restore slider state: only active slide visible
-            this.slides.forEach((slide, i) => {
-                const mask = slide.querySelector('.slider-slide__mask');
-                const img = mask?.querySelector('img');
-                const isActive = i === this.currentIndex;
-
-                gsap.set(mask, { xPercent: isActive ? 0 : 100 });
-                gsap.set(img, { xPercent: isActive ? 0 : -100 });
-            });
-
-            // Start active slide slightly scaled down for expand effect
-            gsap.set(activeSlide, { scale: 0.9, opacity: 0.8 });
+            // Reset mask for slider mode
+            gsap.set(activeMask, { xPercent: 0, position: '', inset: '', width: '', height: '' });
+            gsap.set(activeImg, { xPercent: 0 });
         });
 
-        // Step 3: Scale active slide back to fullscreen
+        // Step 3: Expand active slide to fullscreen
         tl.to(activeSlide, {
-            scale: 1,
-            opacity: 1,
-            duration: 0.5,
-            ease: 'power2.out',
+            width: '100%',
+            height: '100%',
+            borderRadius: '0rem',
+            duration: 0.7,
+            ease: 'power2.inOut',
             onComplete: () => {
-                gsap.set(activeSlide, { clearProps: 'scale,opacity' });
+                // Clean up: remove margin auto, restore normal slider state
+                gsap.set(activeSlide, { clearProps: 'all' });
+
+                // Restore all slides to slider state
+                this.slides.forEach((slide, i) => {
+                    gsap.set(slide, { clearProps: 'all' });
+                    const mask = slide.querySelector('.slider-slide__mask');
+                    const img = mask?.querySelector('img');
+                    gsap.set(mask, { clearProps: 'all' });
+                    gsap.set(img, { clearProps: 'all' });
+
+                    const isActive = i === this.currentIndex;
+                    gsap.set(mask, { xPercent: isActive ? 0 : 100 });
+                    gsap.set(img, { xPercent: isActive ? 0 : -100 });
+                });
+
                 this.isAnimating = false;
                 this.mode = 'slider';
-                saveSliderState(this.currentIndex, this.mode);
+                saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
             },
         });
     }
 
-    /**
-     * Navigate in carousel mode using a clean crossfade approach:
-     * 1. Fade out current 3 items
-     * 2. Update index + reassign classes
-     * 3. Fade in new 3 items
-     */
-    navigateCarousel(direction) {
-        this.isAnimating = true;
-        const total = this.projects.length;
+    // ==========================================
+    // Carousel Engine (infinite, progress-based)
+    // ==========================================
 
-        // Determine the leaving side
-        const oldPrevIdx = (this.currentIndex - 1 + total) % total;
-        const oldNextIdx = (this.currentIndex + 1) % total;
-        const leavingSlide = direction === 'next'
-            ? this.slides[oldPrevIdx]
-            : this.slides[oldNextIdx];
-
-        // Update current index
-        this.currentIndex = direction === 'prev'
-            ? (this.currentIndex - 1 + total) % total
-            : (this.currentIndex + 1) % total;
-
-        this.updateProjectInfo(this.currentIndex);
-        saveSliderState(this.currentIndex, this.mode);
-
-        // The new incoming slide (the new prev or new next)
-        const newIncomingIdx = direction === 'next'
-            ? (this.currentIndex + 1) % total
-            : (this.currentIndex - 1 + total) % total;
-        const incomingSlide = this.slides[newIncomingIdx];
-
-        const tl = gsap.timeline({
-            onComplete: () => {
-                // Ensure clean state
-                gsap.set(incomingSlide, { clearProps: 'opacity' });
-                gsap.set(leavingSlide, { clearProps: 'opacity' });
-                this.isAnimating = false;
-            },
-        });
-
-        // Step 1: Fade out the leaving slide
-        tl.to(leavingSlide, {
-            opacity: 0,
-            duration: 0.3,
-            ease: 'power2.in',
-        });
-
-        // Step 2: Swap classes at the midpoint
-        tl.call(() => {
-            this._removeCarouselClasses();
-            this._applyCarouselClasses();
-
-            // Reset mask on incoming slide
-            const inMask = incomingSlide.querySelector('.slider-slide__mask');
-            const inImg = inMask?.querySelector('img');
-            gsap.set(inMask, { xPercent: 0 });
-            gsap.set(inImg, { xPercent: 0 });
-
-            // Start incoming invisible
-            gsap.set(incomingSlide, { opacity: 0 });
-
-            // Clear leaving slide inline styles (CSS handles hidden)
-            gsap.set(leavingSlide, { clearProps: 'opacity' });
-        });
-
-        // Step 3: Fade in the new incoming slide
-        tl.to(incomingSlide, {
-            opacity: 1,
-            duration: 0.35,
-            ease: 'power2.out',
-        });
+    _calculateCarouselDimensions() {
+        const vw = window.innerWidth / 100;
+        // Active item = 690px, spacing includes gap
+        this.carouselItemWidth = 690;
+        this.carouselGap = 3 * vw;
+        this.carouselSpacing = this.carouselItemWidth + this.carouselGap;
+        this.carouselTotalWidth = this.slides.length * this.carouselSpacing;
     }
 
-    // ==========================================
-    // Carousel Helpers
-    // ==========================================
+    _startCarouselTicker() {
+        if (this.carouselTickerActive) return;
+        this.carouselTickerActive = true;
+        gsap.ticker.add(this._boundTick);
+        window.addEventListener('wheel', this._boundWheel, { passive: false });
+        window.addEventListener('resize', this._boundResize);
+    }
 
-    /**
-     * Assign carousel-prev, carousel-active, carousel-next, carousel-hidden classes
-     */
-    _applyCarouselClasses() {
-        const total = this.projects.length;
-        const prevIdx = (this.currentIndex - 1 + total) % total;
-        const nextIdx = (this.currentIndex + 1) % total;
+    _stopCarouselTicker() {
+        this.carouselTickerActive = false;
+        gsap.ticker.remove(this._boundTick);
+        window.removeEventListener('wheel', this._boundWheel);
+        window.removeEventListener('resize', this._boundResize);
+        window.clearTimeout(this.carouselSnapTimeout);
+    }
+
+    _onCarouselWheel(e) {
+        e.preventDefault();
+        this.carouselTargetProgress -= e.deltaY * 0.5;
+
+        // Snap after scroll stops
+        window.clearTimeout(this.carouselSnapTimeout);
+        this.carouselSnapTimeout = window.setTimeout(() => {
+            this._carouselSnap();
+        }, 80);
+    }
+
+    _onCarouselResize() {
+        this._calculateCarouselDimensions();
+    }
+
+    _carouselSnap() {
+        const raw = this.carouselTargetProgress / this.carouselSpacing;
+        const snapped = Math.round(raw) * this.carouselSpacing;
+        this.carouselTargetProgress = snapped;
+    }
+
+    _carouselTick() {
+        if (!this.carouselTickerActive) return;
+
+        if (Math.abs(this.carouselTargetProgress - this.carouselProgress) < 0.5) {
+            this.carouselProgress = this.carouselTargetProgress;
+            this._carouselRender();
+            this._updateCarouselActiveItem();
+        } else {
+            this.carouselProgress += (this.carouselTargetProgress - this.carouselProgress) * 0.15;
+            this._carouselRender();
+        }
+    }
+
+    _carouselRender() {
+        const halfWidth = this.carouselTotalWidth / 2;
+        const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
 
         this.slides.forEach((slide, i) => {
-            slide.classList.remove('carousel-prev', 'carousel-active', 'carousel-next', 'carousel-hidden');
+            const mask = slide.querySelector('.slider-slide__mask');
+            const img = mask?.querySelector('img');
 
-            if (i === this.currentIndex) {
-                slide.classList.add('carousel-active');
-            } else if (i === prevIdx) {
-                slide.classList.add('carousel-prev');
-            } else if (i === nextIdx) {
-                slide.classList.add('carousel-next');
-            } else {
-                slide.classList.add('carousel-hidden');
-            }
+            // Reset mask to neutral for carousel display
+            gsap.set(mask, { xPercent: 0, position: 'relative', inset: 'auto', width: '100%', height: '100%' });
+            gsap.set(img, { xPercent: 0 });
+
+            const initialPos = i * this.carouselSpacing;
+            const currentPos = initialPos + this.carouselProgress;
+            const wrappedPos = wrapFn(currentPos);
+
+            // Calculate distance from center => scale & opacity
+            const distFromCenter = Math.abs(wrappedPos);
+            const maxDist = this.carouselSpacing * 2;
+            const normalizedDist = Math.min(distFromCenter / maxDist, 1);
+
+            // Active gets full size, others shrink slightly
+            const scale = gsap.utils.interpolate(1, 0.8, normalizedDist);
+            const itemOpacity = gsap.utils.interpolate(1, 0.5, normalizedDist);
+
+            gsap.set(slide, {
+                x: wrappedPos,
+                xPercent: -50,
+                left: '50%',
+                top: '50%',
+                yPercent: -50,
+                position: 'absolute',
+                width: `${this.carouselItemWidth}px`,
+                height: '432px',
+                scale: scale,
+                opacity: itemOpacity,
+                borderRadius: '0.4rem',
+                overflow: 'hidden',
+                zIndex: Math.round((1 - normalizedDist) * 10),
+            });
         });
     }
 
-    _removeCarouselClasses() {
-        this.slides.forEach((slide) => {
-            slide.classList.remove('carousel-prev', 'carousel-active', 'carousel-next', 'carousel-hidden');
+    _updateCarouselActiveItem() {
+        const halfWidth = this.carouselTotalWidth / 2;
+        const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+        let closestIdx = 0;
+        let minDist = Infinity;
+
+        this.slides.forEach((slide, i) => {
+            const initialPos = i * this.carouselSpacing;
+            const currentPos = initialPos + this.carouselProgress;
+            const wrappedPos = wrapFn(currentPos);
+
+            if (Math.abs(wrappedPos) < minDist) {
+                minDist = Math.abs(wrappedPos);
+                closestIdx = i;
+            }
         });
+
+        if (closestIdx !== this.currentIndex) {
+            this.currentIndex = closestIdx;
+            this.updateProjectInfo(this.currentIndex);
+            saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
+        }
+    }
+
+    _carouselSnapMove(direction) {
+        const dir = direction === 'next' ? -1 : 1;
+        const currentSnap = Math.round(this.carouselTargetProgress / this.carouselSpacing);
+        this.carouselTargetProgress = (currentSnap + dir) * this.carouselSpacing;
+
+        // Pre-update project info for responsiveness
+        const total = this.projects.length;
+        const nextIndex = ((Math.abs(Math.round(this.carouselTargetProgress / this.carouselSpacing))) % total + total) % total;
+        this.updateProjectInfo(nextIndex);
     }
 
     /**
-     * Apply carousel mode instantly (for restoring from sessionStorage)
+     * Apply carousel mode instantly (restoring from sessionStorage)
      */
     _applyCarouselModeInstant() {
         this.wrapper.classList.add('carousel-mode');
-        this._applyCarouselClasses();
 
-        // Reset all mask transforms for carousel display
+        // Reset all masks
         this.slides.forEach((slide) => {
             const mask = slide.querySelector('.slider-slide__mask');
             const img = mask?.querySelector('img');
-            gsap.set(mask, { xPercent: 0 });
-            gsap.set(img, { xPercent: 0 });
+            gsap.set(mask, { clearProps: 'all' });
+            gsap.set(img, { clearProps: 'all' });
             gsap.set(slide, { clearProps: 'all' });
         });
+
+        // Initialize carousel engine
+        this._calculateCarouselDimensions();
+        this.carouselProgress = -this.currentIndex * this.carouselSpacing;
+        this.carouselTargetProgress = this.carouselProgress;
+        this._carouselRender();
+        this._startCarouselTicker();
     }
 
     // ==========================================
     // Project Info
     // ==========================================
+
+    _getActiveImage(index) {
+        const idx = index !== undefined ? index : this.currentIndex;
+        const slide = this.slides[idx];
+        const img = slide?.querySelector('.slider-slide__mask img');
+        return img?.getAttribute('src') || null;
+    }
 
     updateProjectInfo(index) {
         const project = this.projects[index];
@@ -469,7 +598,8 @@ class HomeSlider {
     }
 
     destroy() {
-        saveSliderState(this.currentIndex, this.mode);
+        saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
+        this._stopCarouselTicker();
         this.prevBtn?.removeEventListener('click', this.onPrev);
         this.nextBtn?.removeEventListener('click', this.onNext);
         this.allProjectsBtn?.removeEventListener('click', this.onToggleCarousel);

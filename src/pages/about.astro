@@ -72,10 +72,25 @@ import aboutData from "../data/about-data.json";
     <div class="relative w-full h-full">
       <div class="absolute inset-0 w-full h-full bg-[#00000033]"></div>
       <img
+        id="transition-image"
         src="/images/chaillot/e242fbc5805242d87b1ede75387c2de2d13c0fbd_3908f48bc3.png"
-        alt="Chaillot"
+        alt="Project"
         class="w-full h-full object-cover"
       />
     </div>
   </section>
 </MainLayout>
+
+<script>
+  // Update transition image from slider state
+  const saved = sessionStorage.getItem("homeSliderState");
+  if (saved) {
+    const state = JSON.parse(saved);
+    if (state.image) {
+      const img = document.getElementById(
+        "transition-image",
+      ) as HTMLImageElement | null;
+      if (img) img.src = state.image;
+    }
+  }
+</script>

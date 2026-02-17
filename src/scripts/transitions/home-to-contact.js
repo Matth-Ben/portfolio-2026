@@ -18,10 +18,18 @@ export default {
 
         cleanupScrollTriggers();
 
-        // Ensure wrapper is in correct state for transition
+        // Save the active slide image for the transition
         const savedState = sessionStorage.getItem('homeSliderState');
         if (savedState) {
             const state = JSON.parse(savedState);
+            // Get image from the active slide in the DOM
+            const activeIndex = state.index || 0;
+            const slide = wrapperProjects?.querySelectorAll('.slider-slide')[activeIndex];
+            const imgEl = slide?.querySelector('.slider-slide__mask img');
+            if (imgEl) {
+                state.image = imgEl.getAttribute('src');
+                sessionStorage.setItem('homeSliderState', JSON.stringify(state));
+            }
             if (state.mode === 'carousel' && wrapperProjects) {
                 await gsap.to(wrapperProjects, {
                     width: '100%',
@@ -53,6 +61,17 @@ export default {
 
     async afterEnter(data) {
         console.log('✨ Page Contact chargée');
+
+        // Update transition image from slider state
+        const savedState = sessionStorage.getItem('homeSliderState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            if (state.image) {
+                const img = data.next.container.querySelector('#transition-image');
+                if (img) img.src = state.image;
+            }
+        }
+
         const links = document.querySelectorAll('.transition-link');
 
         gsap.fromTo(links, {
