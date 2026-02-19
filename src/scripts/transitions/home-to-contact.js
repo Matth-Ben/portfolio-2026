@@ -31,11 +31,82 @@ export default {
                 sessionStorage.setItem('homeSliderState', JSON.stringify(state));
             }
             if (state.mode === 'carousel' && wrapperProjects) {
-                await gsap.to(wrapperProjects, {
-                    width: '100%',
-                    duration: 0.3,
-                    ease: 'power2.out'
+                // Stop the carousel ticker
+                if (window.homeSliderInstance?._stopCarouselTicker) {
+                    window.homeSliderInstance._stopCarouselTicker();
+                }
+                // Fade out + slide outward non-active carousel slides
+                const allSlides = wrapperProjects.querySelectorAll('.slider-slide');
+                const nonActive = Array.from(allSlides).filter((_, i) => i !== activeIndex);
+
+                const inst = window.homeSliderInstance;
+                const halfWidth = inst?.carouselTotalWidth / 2;
+                const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
+
+                // Also fade out UI elements (buttons, project info)
+                const uiElements = document.querySelectorAll('.carousel-btn, .discover-btn, .all-projects-btn, .project-info, .project-counter');
+
+                const slideOutPromises = nonActive.map((s) => {
+                    const i = Array.from(allSlides).indexOf(s);
+                    const initialPos = i * inst.carouselSpacing;
+                    const wrappedPos = wrapFn(initialPos + inst.carouselProgress);
+                    const offsetX = wrappedPos >= 0 ? 150 : -150;
+
+                    return gsap.to(s, {
+                        opacity: 0,
+                        x: wrappedPos + offsetX,
+                        duration: 0.4,
+                        ease: 'power2.in',
+                    });
                 });
+
+                // Fade out UI elements in parallel
+                slideOutPromises.push(
+                    gsap.to(uiElements, {
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                    })
+                );
+
+                await Promise.all(slideOutPromises);
+
+                // Hide non-active slides
+                nonActive.forEach(s => gsap.set(s, { visibility: 'hidden' }));
+
+                // Expand active slide to fullscreen
+                if (slide) {
+                    gsap.set(slide, {
+                        clearProps: 'x,xPercent,yPercent,left,top,scale,zIndex',
+                    });
+                    gsap.set(slide, {
+                        position: 'absolute',
+                        inset: 0,
+                        margin: 'auto',
+                        width: '690px',
+                        height: '432px',
+                        borderRadius: '0.4rem',
+                        overflow: 'hidden',
+                    });
+
+                    // Reset mask
+                    const mask = slide.querySelector('.slider-slide__mask');
+                    const maskImg = mask?.querySelector('img');
+                    gsap.set(mask, { xPercent: 0, position: 'relative', inset: 'auto', width: '100%', height: '100%' });
+                    gsap.set(maskImg, { xPercent: 0 });
+
+                    await gsap.to(slide, {
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '0rem',
+                        duration: 0.5,
+                        ease: 'power2.inOut',
+                    });
+
+                    gsap.set(slide, { clearProps: 'margin,borderRadius,overflow' });
+                }
+
+                wrapperProjects.classList.remove('carousel-mode');
             }
         }
 

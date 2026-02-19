@@ -9,7 +9,7 @@ import homeData from "../data/home-data.json";
     class="mainHome absolute inset-0 w-full h-screen m-auto overflow-hidden"
   >
     <nav
-      class="absolute top-1/2 left-0 right-0 z-20 px-[1rem] md:px-[2rem] -translate-y-full pb-[2rem]"
+      class="absolute top-1/2 left-0 right-0 z-20 px-4 md:px-5 -translate-y-full pb-5"
     >
       <ul class="flex items-center justify-between w-full">
         <li>
@@ -27,7 +27,7 @@ import homeData from "../data/home-data.json";
 
     <div
       id="navigation-info"
-      class="absolute top-1/2 left-0 right-0 z-20 max-md:h-1/2 px-[1rem] md:px-[2rem]"
+      class="absolute top-1/2 left-0 right-0 z-20 max-md:h-1/2 px-4 md:px-5"
     >
       <div class="relative">
         <div class="relative w-full h-[1px] bg-[#EAE8DE] opacity-30"></div>
@@ -37,9 +37,9 @@ import homeData from "../data/home-data.json";
         >
         </div>
       </div>
-      <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-[2rem]">
+      <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-5">
         <div
-          class="col-span-8 md:col-span-7 order-2 md:order-1 max-md:flex max-md:justify-center max-md:items-end max-md:pb-[2rem]"
+          class="col-span-8 md:col-span-7 order-2 md:order-1 max-md:flex max-md:justify-center max-md:items-end max-md:pb-5"
         >
           <h1 class="ts-title text-center md:text-left">
             Matthias benoit<br />
@@ -50,9 +50,9 @@ import homeData from "../data/home-data.json";
           class="col-span-8 md:col-span-5 lg:col-span-3 xl:col-span-2 md:col-start-8 lg:col-start-10 xl:col-start-11 flex flex-col items-end order-1 md:order-2 ts-body"
         >
           {/* Titres des projets et numéro */}
-          <div class="flex flex-col items-end gap-[1rem] w-full">
+          <div class="flex flex-col items-end gap-4 w-full">
             <div
-              class="project-info flex items-start justify-between gap-[1rem] w-full"
+              class="project-info flex items-start justify-between gap-4 w-full"
             >
               <div class="project-title flex-1">
                 {homeData.projects[0].title || "Projet sans titre"}
@@ -67,7 +67,7 @@ import homeData from "../data/home-data.json";
               homeData.projects[0].slug && (
                 <a
                   href={`/projects/${homeData.projects[0].slug}`}
-                  class="discover-btn flex items-center gap-[0.5rem]"
+                  class="discover-btn flex items-center gap-2"
                 >
                   <svg
                     width="10"
@@ -88,7 +88,7 @@ import homeData from "../data/home-data.json";
           </div>
 
           {/* Boutons de navigation */}
-          <div class="w-full mt-[1.5rem]">
+          <div class="w-full mt-4">
             <div class="flex items-center justify-between">
               <button
                 class="carousel-btn carousel-btn-prev ts-body"
@@ -107,9 +107,9 @@ import homeData from "../data/home-data.json";
           </div>
 
           {/* Bouton All projects */}
-          <div class="mt-[1rem]">
+          <div class="mt-4">
             <button
-              class="all-projects-btn flex items-center gap-[1rem] ts-little"
+              class="all-projects-btn flex items-center gap-4 ts-little"
             >
               All projects
               <span class="w-[8px] h-[10px] bg-white"></span>

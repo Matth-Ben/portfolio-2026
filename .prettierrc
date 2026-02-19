@@ -1,0 +1,4 @@
+{
+	"plugins": ["@zackad/prettier-plugin-twig", "@prettier/plugin-php", "prettier-plugin-tailwindcss"],
+	"printWidth": 200
+}

@@ -43,6 +43,11 @@ class HomeSlider {
         this.carouselTotalWidth = 0;
         this.carouselTickerActive = false;
         this.carouselSnapTimeout = 0;
+        this.carouselVelocity = 0;
+        this.carouselIsScrolling = false;
+        this.carouselScrollTimeout = 0;
+        this.carouselFriction = 0.95;
+        this.carouselSnapThreshold = 0.5;
         this._boundTick = this._carouselTick.bind(this);
         this._boundWheel = this._onCarouselWheel.bind(this);
         this._boundResize = this._onCarouselResize.bind(this);
@@ -173,12 +178,13 @@ class HomeSlider {
         const tl = gsap.timeline();
 
         // Step 1: Shrink active slide while keeping it centered
+        const targetWidth = window.innerWidth * 0.69;
+        const targetHeight = targetWidth * (432 / 690);
         gsap.set(activeSlide, { margin: 'auto' });
 
         tl.to(activeSlide, {
-            width: '690px',
-            height: '432px',
-            borderRadius: '0.4rem',
+            width: targetWidth,
+            height: targetHeight,
             duration: 0.7,
             ease: 'power2.inOut',
         }, 0);
@@ -198,8 +204,11 @@ class HomeSlider {
                 }
             });
 
-            // Clear margin/borderRadius from shrink animation
-            gsap.set(activeSlide, { clearProps: 'margin,borderRadius,inset' });
+            // Clear margin from shrink animation
+            gsap.set(activeSlide, { clearProps: 'margin,inset' });
+
+            // Set active class BEFORE adding carousel-mode to prevent overlay flash
+            activeSlide.classList.add('active');
 
             // Switch to carousel mode layout
             this.wrapper.classList.add('carousel-mode');
@@ -224,11 +233,10 @@ class HomeSlider {
                 top: '50%',
                 yPercent: -50,
                 position: 'absolute',
-                width: `${this.carouselItemWidth}px`,
-                height: '432px',
-                scale: 1,
+                width: '69vw',
+                height: 'auto',
+                aspectRatio: '690/432',
                 opacity: 1,
-                borderRadius: '0.4rem',
                 overflow: 'hidden',
                 zIndex: 10,
             });
@@ -242,7 +250,6 @@ class HomeSlider {
                     const distFromCenter = Math.abs(wrappedPos);
                     const maxDist = this.carouselSpacing * 2;
                     const normalizedDist = Math.min(distFromCenter / maxDist, 1);
-                    const scale = gsap.utils.interpolate(1, 0.8, normalizedDist);
                     const itemOpacity = gsap.utils.interpolate(1, 0.5, normalizedDist);
 
                     // Set initial state: offset outward, transparent
@@ -255,10 +262,9 @@ class HomeSlider {
                         top: '50%',
                         yPercent: -50,
                         position: 'absolute',
-                        width: `${this.carouselItemWidth}px`,
-                        height: '432px',
-                        scale: scale,
-                        borderRadius: '0.4rem',
+                        width: '69vw',
+                        height: 'auto',
+                        aspectRatio: '690/432',
                         overflow: 'hidden',
                         zIndex: Math.round((1 - normalizedDist) * 10),
                     });
@@ -348,21 +354,24 @@ class HomeSlider {
                 gsap.set(slide, { visibility: 'hidden' });
             });
 
+            // Remove active classes BEFORE removing carousel-mode to prevent overlay flash
+            this.slides.forEach(slide => slide.classList.remove('active'));
+
             // Remove carousel-mode so the wrapper is back to normal
             this.wrapper.classList.remove('carousel-mode');
 
             // Set active slide to absolute centered with its current carousel size
             // Using inset:0 + margin:auto for perfect centering during expand
             gsap.set(activeSlide, {
-                clearProps: 'x,xPercent,yPercent,left,top,scale,zIndex',
+                clearProps: 'x,xPercent,yPercent,left,top,zIndex',
             });
             gsap.set(activeSlide, {
                 position: 'absolute',
                 inset: 0,
                 margin: 'auto',
-                width: '690px',
-                height: '432px',
-                borderRadius: '0.4rem',
+                width: '69vw',
+                height: 'auto',
+                aspectRatio: '690/432',
                 overflow: 'hidden',
             });
 
@@ -375,7 +384,6 @@ class HomeSlider {
         tl.to(activeSlide, {
             width: '100%',
             height: '100%',
-            borderRadius: '0rem',
             duration: 0.7,
             ease: 'power2.inOut',
             onComplete: () => {
@@ -385,6 +393,7 @@ class HomeSlider {
                 // Restore all slides to slider state
                 this.slides.forEach((slide, i) => {
                     gsap.set(slide, { clearProps: 'all' });
+                    slide.classList.remove('active');
                     const mask = slide.querySelector('.slider-slide__mask');
                     const img = mask?.querySelector('img');
                     gsap.set(mask, { clearProps: 'all' });
@@ -408,8 +417,8 @@ class HomeSlider {
 
     _calculateCarouselDimensions() {
         const vw = window.innerWidth / 100;
-        // Active item = 690px, spacing includes gap
-        this.carouselItemWidth = 690;
+        // Active item = 69vw, spacing includes gap
+        this.carouselItemWidth = 69 * vw;
         this.carouselGap = 3 * vw;
         this.carouselSpacing = this.carouselItemWidth + this.carouselGap;
         this.carouselTotalWidth = this.slides.length * this.carouselSpacing;
@@ -433,17 +442,39 @@ class HomeSlider {
 
     _onCarouselWheel(e) {
         e.preventDefault();
-        this.carouselTargetProgress -= e.deltaY * 0.5;
 
-        // Snap after scroll stops
-        window.clearTimeout(this.carouselSnapTimeout);
-        this.carouselSnapTimeout = window.setTimeout(() => {
-            this._carouselSnap();
-        }, 80);
+        // Accumulate velocity from wheel input
+        this.carouselVelocity -= e.deltaY * 0.5;
+        this.carouselIsScrolling = true;
+
+        // When scrolling pauses: predict landing and snap target
+        window.clearTimeout(this.carouselScrollTimeout);
+        this.carouselScrollTimeout = window.setTimeout(() => {
+            this.carouselIsScrolling = false;
+
+            // Predict where momentum would carry us (geometric series sum)
+            const predictedDistance = this.carouselVelocity * this.carouselFriction / (1 - this.carouselFriction);
+            const predictedPosition = this.carouselTargetProgress + predictedDistance;
+
+            // Snap to nearest item at predicted position
+            const snapped = Math.round(predictedPosition / this.carouselSpacing) * this.carouselSpacing;
+            this.carouselTargetProgress = snapped;
+            this.carouselVelocity = 0;
+        }, 150);
     }
 
     _onCarouselResize() {
+        const oldSpacing = this.carouselSpacing;
         this._calculateCarouselDimensions();
+
+        // Rescale progress so the current item stays centered
+        if (oldSpacing > 0) {
+            const ratio = this.carouselSpacing / oldSpacing;
+            this.carouselProgress *= ratio;
+            this.carouselTargetProgress *= ratio;
+        }
+
+        this._carouselRender();
     }
 
     _carouselSnap() {
@@ -455,12 +486,20 @@ class HomeSlider {
     _carouselTick() {
         if (!this.carouselTickerActive) return;
 
-        if (Math.abs(this.carouselTargetProgress - this.carouselProgress) < 0.5) {
+        if (this.carouselIsScrolling) {
+            // While actively scrolling: apply velocity to target
+            this.carouselTargetProgress += this.carouselVelocity;
+            this.carouselVelocity *= 0.8;
+        }
+
+        // Smooth lerp toward target
+        const diff = this.carouselTargetProgress - this.carouselProgress;
+        if (Math.abs(diff) < 0.5) {
             this.carouselProgress = this.carouselTargetProgress;
             this._carouselRender();
             this._updateCarouselActiveItem();
         } else {
-            this.carouselProgress += (this.carouselTargetProgress - this.carouselProgress) * 0.15;
+            this.carouselProgress += diff * 0.08;
             this._carouselRender();
         }
     }
@@ -486,8 +525,7 @@ class HomeSlider {
             const maxDist = this.carouselSpacing * 2;
             const normalizedDist = Math.min(distFromCenter / maxDist, 1);
 
-            // Active gets full size, others shrink slightly
-            const scale = gsap.utils.interpolate(1, 0.8, normalizedDist);
+            // All items same size, only opacity changes with distance
             const itemOpacity = gsap.utils.interpolate(1, 0.5, normalizedDist);
 
             gsap.set(slide, {
@@ -497,14 +535,20 @@ class HomeSlider {
                 top: '50%',
                 yPercent: -50,
                 position: 'absolute',
-                width: `${this.carouselItemWidth}px`,
-                height: '432px',
-                scale: scale,
+                width: '69vw',
+                height: 'auto',
+                aspectRatio: '690/432',
                 opacity: itemOpacity,
-                borderRadius: '0.4rem',
                 overflow: 'hidden',
                 zIndex: Math.round((1 - normalizedDist) * 10),
             });
+
+            // Toggle active class for CSS overlay
+            if (distFromCenter < this.carouselSpacing * 0.5) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
         });
     }
 
@@ -534,6 +578,8 @@ class HomeSlider {
     }
 
     _carouselSnapMove(direction) {
+        this.carouselVelocity = 0;
+        this.carouselIsScrolling = false;
         const dir = direction === 'next' ? -1 : 1;
         const currentSnap = Math.round(this.carouselTargetProgress / this.carouselSpacing);
         this.carouselTargetProgress = (currentSnap + dir) * this.carouselSpacing;
@@ -612,6 +658,9 @@ let instance = null;
 const init = () => {
     instance?.destroy();
     instance = new HomeSlider();
+    if (typeof window !== 'undefined') {
+        window.homeSliderInstance = instance;
+    }
 };
 
 if (document.readyState === 'loading') {
