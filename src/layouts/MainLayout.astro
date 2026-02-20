@@ -42,6 +42,19 @@ import "../styles/loader.css";
       >
         <slot />
 
+        <svg style="display:none;">
+          <filter id="noiseFilter">
+            <feTurbulence 
+              type="fractalNoise" 
+              baseFrequency="0.4" 
+              numOctaves="1" 
+              stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0"/>
+          </filter>
+        </svg>
+
+        <div class="grain-overlay"></div>
+
         <!-- Hidden data for state restoration -->
         <div
           id="home-projects-data"

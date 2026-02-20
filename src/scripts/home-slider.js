@@ -178,7 +178,7 @@ class HomeSlider {
         const tl = gsap.timeline();
 
         // Step 1: Shrink active slide while keeping it centered
-        const targetWidth = window.innerWidth * 0.69;
+        const targetWidth = 43.125 * 16;
         const targetHeight = targetWidth * (432 / 690);
         gsap.set(activeSlide, { margin: 'auto' });
 
@@ -233,7 +233,7 @@ class HomeSlider {
                 top: '50%',
                 yPercent: -50,
                 position: 'absolute',
-                width: '69vw',
+                width: '43.125rem',
                 height: 'auto',
                 aspectRatio: '690/432',
                 opacity: 1,
@@ -262,7 +262,7 @@ class HomeSlider {
                         top: '50%',
                         yPercent: -50,
                         position: 'absolute',
-                        width: '69vw',
+                        width: '43.125rem',
                         height: 'auto',
                         aspectRatio: '690/432',
                         overflow: 'hidden',
@@ -369,7 +369,7 @@ class HomeSlider {
                 position: 'absolute',
                 inset: 0,
                 margin: 'auto',
-                width: '69vw',
+                width: '43.125rem',
                 height: 'auto',
                 aspectRatio: '690/432',
                 overflow: 'hidden',
@@ -416,10 +416,8 @@ class HomeSlider {
     // ==========================================
 
     _calculateCarouselDimensions() {
-        const vw = window.innerWidth / 100;
-        // Active item = 69vw, spacing includes gap
-        this.carouselItemWidth = 69 * vw;
-        this.carouselGap = 3 * vw;
+        this.carouselItemWidth = 43.125 * 16;
+        this.carouselGap = 2.5 * 16;
         this.carouselSpacing = this.carouselItemWidth + this.carouselGap;
         this.carouselTotalWidth = this.slides.length * this.carouselSpacing;
     }
@@ -535,7 +533,7 @@ class HomeSlider {
                 top: '50%',
                 yPercent: -50,
                 position: 'absolute',
-                width: '69vw',
+                width: '43.125rem',
                 height: 'auto',
                 aspectRatio: '690/432',
                 opacity: itemOpacity,
