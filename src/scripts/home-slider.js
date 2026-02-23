@@ -28,6 +28,7 @@ class HomeSlider {
         this.counterEl = document.querySelector('.project-counter');
         this.discoverBtn = document.querySelector('.discover-btn');
         this.allProjectsBtn = document.querySelector('.all-projects-btn');
+        this.transitionLinks = document.querySelectorAll('.transition-link');
 
         this.currentIndex = 0;
         this.projects = [];
@@ -85,9 +86,15 @@ class HomeSlider {
         this.onPrev = () => this.navigate('prev');
         this.onNext = () => this.navigate('next');
         this.onToggleCarousel = () => this.toggleCarousel();
+        this.onKeyDown = (e) => {
+            if (e.key === 'Escape' && this.mode === 'carousel') {
+                this.toggleCarousel();
+            }
+        };
         this.prevBtn?.addEventListener('click', this.onPrev);
         this.nextBtn?.addEventListener('click', this.onNext);
         this.allProjectsBtn?.addEventListener('click', this.onToggleCarousel);
+        window.addEventListener('keydown', this.onKeyDown);
 
         // If saved state was carousel, restore it immediately
         if (this.mode === 'carousel') {
@@ -176,6 +183,11 @@ class HomeSlider {
         const activeImg = activeMask?.querySelector('img');
 
         const tl = gsap.timeline();
+
+        // Animate out transition links
+        this.transitionLinks.forEach(link => {
+            tl.to(link, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 0);
+        });
 
         // Step 1: Shrink active slide while keeping it centered
         const targetWidth = 43.125 * 16;
@@ -307,6 +319,11 @@ class HomeSlider {
             this.isAnimating = false;
             this.mode = 'carousel';
             saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
+
+            // Update button text to "Close"
+            if (this.allProjectsBtn) {
+                this.allProjectsBtn.childNodes[0].textContent = 'Close ';
+            }
         }, null, `+=${0.6 + entranceData.length * 0.03 + 0.1}`);
     }
 
@@ -403,6 +420,16 @@ class HomeSlider {
                     gsap.set(mask, { xPercent: isActive ? 0 : 100 });
                     gsap.set(img, { xPercent: isActive ? 0 : -100 });
                 });
+
+                // Animate transition links back in
+                this.transitionLinks.forEach(link => {
+                    gsap.to(link, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' });
+                });
+
+                // Restore button text
+                if (this.allProjectsBtn) {
+                    this.allProjectsBtn.childNodes[0].textContent = 'All projects ';
+                }
 
                 this.isAnimating = false;
                 this.mode = 'slider';
@@ -603,6 +630,16 @@ class HomeSlider {
             gsap.set(slide, { clearProps: 'all' });
         });
 
+        // Hide transition links instantly
+        this.transitionLinks.forEach(link => {
+            gsap.set(link, { y: -20, opacity: 0 });
+        });
+
+        // Update button text
+        if (this.allProjectsBtn) {
+            this.allProjectsBtn.childNodes[0].textContent = 'Close ';
+        }
+
         // Initialize carousel engine
         this._calculateCarouselDimensions();
         this.carouselProgress = -this.currentIndex * this.carouselSpacing;
@@ -647,6 +684,7 @@ class HomeSlider {
         this.prevBtn?.removeEventListener('click', this.onPrev);
         this.nextBtn?.removeEventListener('click', this.onNext);
         this.allProjectsBtn?.removeEventListener('click', this.onToggleCarousel);
+        window.removeEventListener('keydown', this.onKeyDown);
     }
 }
 
