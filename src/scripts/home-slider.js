@@ -20,6 +20,17 @@ function getSliderState() {
  */
 class HomeSlider {
     constructor() {
+        // Strict singleton enforcement: if an instance already exists, destroy it.
+        if (typeof window !== 'undefined' && window.homeSliderInstance) {
+            window.homeSliderInstance.destroy();
+        }
+
+        this.id = Math.random().toString(36).substr(2, 5);
+
+        if (typeof window !== 'undefined') {
+            window.homeSliderInstance = this;
+        }
+
         this.wrapper = document.querySelector('.wrapperProjects');
         this.slides = document.querySelectorAll('.slider-slide');
         this.prevBtn = document.querySelector('.carousel-btn-prev');
@@ -123,16 +134,32 @@ class HomeSlider {
     navigate(direction) {
         if (this.isAnimating) return;
 
-        this.stopAutoSlide(false); // Stop auto-slide but keep progress bar visual state for click animation
+        // Instantly lock navigation to prevent race conditions during rapid clicks
+        this.isAnimating = true;
+
+        // Kill any auto-slide logic currently running
+        this.stopAutoSlide(false);
 
         if (this.mode === 'carousel') {
             this._carouselSnapMove(direction);
+            // Snap move is instant, so release the lock
+            this.isAnimating = false;
             return;
         }
 
-        this.isAnimating = true;
+        // Calculate the next target indices IMMEDIATELY
+        const prevIndex = this.currentIndex;
+        const total = this.projects.length;
 
+        this.currentIndex = direction === 'prev'
+            ? (this.currentIndex - 1 + total) % total
+            : (this.currentIndex + 1) % total;
+
+
+        // Play visual progress bar animation, THEN transition slide
         if (this.progressBar) {
+            gsap.killTweensOf(this.progressBar);
+
             if (direction === 'next') {
                 this.progressTween = gsap.to(this.progressBar, {
                     scaleX: 1,
@@ -144,10 +171,7 @@ class HomeSlider {
                             scaleX: 0,
                             duration: 0.2,
                             ease: 'power2.in',
-                            onComplete: () => {
-                                this.isAnimating = false; // Reset to allow _doNavigateTarget to run
-                                this._doNavigateTarget(direction);
-                            }
+                            onComplete: () => this.showSlide(this.currentIndex, prevIndex, direction)
                         });
                     }
                 });
@@ -156,29 +180,12 @@ class HomeSlider {
                     scaleX: 0,
                     duration: 0.15,
                     ease: 'power2.out',
-                    onComplete: () => {
-                        this.isAnimating = false; // Reset to allow _doNavigateTarget to run
-                        this._doNavigateTarget(direction);
-                    }
+                    onComplete: () => this.showSlide(this.currentIndex, prevIndex, direction)
                 });
             }
         } else {
-            this.isAnimating = false;
-            this._doNavigateTarget(direction);
+            this.showSlide(this.currentIndex, prevIndex, direction);
         }
-    }
-
-    _doNavigateTarget(direction) {
-        if (this.isAnimating) return;
-
-        const prevIndex = this.currentIndex;
-        const total = this.projects.length;
-
-        this.currentIndex = direction === 'prev'
-            ? (this.currentIndex - 1 + total) % total
-            : (this.currentIndex + 1) % total;
-
-        this.showSlide(this.currentIndex, prevIndex, direction);
     }
 
     showSlide(nextIndex, prevIndex, direction) {
@@ -724,15 +731,19 @@ class HomeSlider {
                     ease: 'none',
                     onComplete: () => {
                         // After delay, shrink bar to the right, then navigate
+                        if (this.isAnimating || this.mode !== 'slider') return; // Safety check
+                        this.isAnimating = true; // Lock manual updates
+
                         gsap.set(this.progressBar, { transformOrigin: 'right' });
                         this.progressTween = gsap.to(this.progressBar, {
                             scaleX: 0,
                             duration: 0.3,
                             ease: 'power2.in',
                             onComplete: () => {
-                                if (!this.isAnimating && this.mode === 'slider') {
-                                    this.navigate('next');
-                                }
+                                const prevIndex = this.currentIndex;
+                                const total = this.projects.length;
+                                this.currentIndex = (this.currentIndex + 1) % total;
+                                this.showSlide(this.currentIndex, prevIndex, 'next');
                             }
                         });
                     }
@@ -741,7 +752,11 @@ class HomeSlider {
                 // Fallback if no progress bar is found
                 this.progressTween = gsap.delayedCall(this.autoSlideDelay / 1000, () => {
                     if (!this.isAnimating && this.mode === 'slider') {
-                        this.navigate('next');
+                        this.isAnimating = true;
+                        const prevIndex = this.currentIndex;
+                        const total = this.projects.length;
+                        this.currentIndex = (this.currentIndex + 1) % total;
+                        this.showSlide(this.currentIndex, prevIndex, 'next');
                     }
                 });
             }
@@ -793,18 +808,28 @@ class HomeSlider {
         this.nextBtn?.removeEventListener('click', this.onNext);
         this.allProjectsBtn?.removeEventListener('click', this.onToggleCarousel);
         window.removeEventListener('keydown', this.onKeyDown);
+
+        // Ensure all running tweens on our elements are killed
+        if (this.progressBar) gsap.killTweensOf(this.progressBar);
+        this.slides.forEach(slide => {
+            gsap.killTweensOf(slide);
+            const mask = slide.querySelector('.slider-slide__mask');
+            if (mask) {
+                gsap.killTweensOf(mask);
+                const img = mask.querySelector('img');
+                if (img) gsap.killTweensOf(img);
+            }
+        });
+        this.transitionLinks.forEach(link => gsap.killTweensOf(link));
     }
 }
 
-// Singleton instance
-let instance = null;
+// ---------------------------------------------------------
+// Strict window-level initialization to prevent duplicates
+// ---------------------------------------------------------
 
 const init = () => {
-    instance?.destroy();
-    instance = new HomeSlider();
-    if (typeof window !== 'undefined') {
-        window.homeSliderInstance = instance;
-    }
+    new HomeSlider();
 };
 
 if (document.readyState === 'loading') {
@@ -813,8 +838,11 @@ if (document.readyState === 'loading') {
     init();
 }
 
-if (typeof window !== 'undefined') {
-    window.HomeSlider = HomeSlider;
+// Astro view transitions re-trigger point
+if (typeof document !== 'undefined') {
+    document.addEventListener('astro:page-load', () => {
+        init();
+    });
 }
 
 export default HomeSlider;

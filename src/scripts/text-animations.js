@@ -59,8 +59,6 @@ export const initTextAnimations = async () => {
             charsClass: 'split-char'
         });
 
-        console.log(split)
-
         // Get the split elements based on type
         let targets;
         switch (splitType) {
@@ -111,7 +109,6 @@ async function waitForFonts() {
             // Race between fonts.ready and 2s timeout
             const timeout = new Promise(resolve => setTimeout(resolve, 2000));
             await Promise.race([document.fonts.ready, timeout]);
-            console.log('✅ Fonts loaded');
         } catch (error) {
             console.warn('Font loading check failed:', error);
         }

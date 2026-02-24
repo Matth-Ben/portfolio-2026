@@ -8,8 +8,6 @@ import { initTextAnimationDebugger } from './text-animation-debugger.js';
  * Point d'entrée principal de l'application
  */
 async function init() {
-    console.log('🚀 Initializing portfolio...');
-
     // Attendre que tous les styles CSS soient chargés
     await waitForStyles();
 
@@ -30,8 +28,6 @@ async function init() {
 
     // 6. Hide page loader
     hideLoader();
-
-    console.log('✅ Portfolio initialized successfully');
 }
 
 /**

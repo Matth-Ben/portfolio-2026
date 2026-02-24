@@ -52,8 +52,6 @@ export function initPageAnimations(skipImmediate = false) {
                 );
             }
         });
-
-        console.log(`✅ Initialized ${fadeElements.length} fade-in animations`);
     }, delay);
 }
 
@@ -63,5 +61,4 @@ export function initPageAnimations(skipImmediate = false) {
 export function cleanupScrollTriggers() {
     const triggers = ScrollTrigger.getAll();
     triggers.forEach((trigger) => trigger.kill());
-    console.log(`🗑️ Cleaned up ${triggers.length} ScrollTriggers`);
 }

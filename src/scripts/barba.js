@@ -67,8 +67,6 @@ export function initBarba() {
             {
                 namespace: 'home',
                 afterEnter() {
-                    console.log('🏠 Home page loaded');
-
                     // Reinitialize home slider
                     const HomeSlider = window.HomeSlider;
                     if (HomeSlider) {
@@ -85,7 +83,6 @@ export function initBarba() {
             {
                 namespace: 'about',
                 afterEnter() {
-                    console.log('👤 About page loaded');
                     updateTransitionImage();
                 },
             },
@@ -98,7 +95,6 @@ export function initBarba() {
             {
                 namespace: 'contact',
                 afterEnter() {
-                    console.log('📧 Contact page loaded');
                     updateTransitionImage();
                 },
             },
@@ -131,6 +127,4 @@ export function initBarba() {
             }
         }
     });
-
-    console.log('✅ Barba.js initialized with custom transitions');
 }

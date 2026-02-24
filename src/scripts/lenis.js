@@ -27,8 +27,6 @@ export function initLenis() {
     });
 
     gsap.ticker.lagSmoothing(0);
-
-    console.log('✅ Lenis initialized');
 }
 
 /**
@@ -38,7 +36,6 @@ export function destroyLenis() {
     if (lenis) {
         lenis.destroy();
         lenis = null;
-        console.log('🗑️ Lenis destroyed');
     }
 }
 
