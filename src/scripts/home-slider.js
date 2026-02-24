@@ -35,6 +35,10 @@ class HomeSlider {
         this.isAnimating = false;
         this.mode = 'slider';
 
+        this.autoSlideDelay = 5000;
+        this.progressBar = document.querySelector('.progress-bar');
+        this.progressTween = null;
+
         // Carousel engine state
         this.carouselProgress = 0;
         this.carouselTargetProgress = 0;
@@ -99,6 +103,8 @@ class HomeSlider {
         // If saved state was carousel, restore it immediately
         if (this.mode === 'carousel') {
             this._applyCarouselModeInstant();
+        } else {
+            this.startAutoSlide();
         }
     }
 
@@ -117,10 +123,53 @@ class HomeSlider {
     navigate(direction) {
         if (this.isAnimating) return;
 
+        this.stopAutoSlide(false); // Stop auto-slide but keep progress bar visual state for click animation
+
         if (this.mode === 'carousel') {
             this._carouselSnapMove(direction);
             return;
         }
+
+        this.isAnimating = true;
+
+        if (this.progressBar) {
+            if (direction === 'next') {
+                this.progressTween = gsap.to(this.progressBar, {
+                    scaleX: 1,
+                    duration: 0.15,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        gsap.set(this.progressBar, { transformOrigin: 'right' });
+                        this.progressTween = gsap.to(this.progressBar, {
+                            scaleX: 0,
+                            duration: 0.2,
+                            ease: 'power2.in',
+                            onComplete: () => {
+                                this.isAnimating = false; // Reset to allow _doNavigateTarget to run
+                                this._doNavigateTarget(direction);
+                            }
+                        });
+                    }
+                });
+            } else {
+                this.progressTween = gsap.to(this.progressBar, {
+                    scaleX: 0,
+                    duration: 0.15,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        this.isAnimating = false; // Reset to allow _doNavigateTarget to run
+                        this._doNavigateTarget(direction);
+                    }
+                });
+            }
+        } else {
+            this.isAnimating = false;
+            this._doNavigateTarget(direction);
+        }
+    }
+
+    _doNavigateTarget(direction) {
+        if (this.isAnimating) return;
 
         const prevIndex = this.currentIndex;
         const total = this.projects.length;
@@ -148,7 +197,10 @@ class HomeSlider {
 
         const tl = gsap.timeline({
             defaults: { duration: 0.6, ease: 'power2.inOut' },
-            onComplete: () => { this.isAnimating = false; },
+            onComplete: () => {
+                this.isAnimating = false;
+                this.startAutoSlide(); // Restart auto-slide after transition
+            },
         });
 
         tl.fromTo(nextMask, { xPercent: enter }, { xPercent: 0 }, 0);
@@ -163,6 +215,8 @@ class HomeSlider {
 
     toggleCarousel() {
         if (this.isAnimating) return;
+
+        this.stopAutoSlide(); // Always stop auto-slide when toggling mode
 
         if (this.mode === 'slider') {
             this._transitionToCarousel();
@@ -434,6 +488,7 @@ class HomeSlider {
                 this.isAnimating = false;
                 this.mode = 'slider';
                 saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
+                this.startAutoSlide(); // Restart when back in slider mode
             },
         });
     }
@@ -646,11 +701,63 @@ class HomeSlider {
         this.carouselTargetProgress = this.carouselProgress;
         this._carouselRender();
         this._startCarouselTicker();
+
+        this.stopAutoSlide();
     }
 
     // ==========================================
-    // Project Info
+    // Project Info & Auto Slide
     // ==========================================
+
+    startAutoSlide() {
+        this.stopAutoSlide(true); // Stop and reset progress bar to 0%
+
+        if (this.mode === 'slider') {
+            if (this.progressBar) {
+                // Force bar to 0% expanding from left
+                gsap.set(this.progressBar, { scaleX: 0, transformOrigin: 'left' });
+
+                // Animate progress bar over the delay
+                this.progressTween = gsap.to(this.progressBar, {
+                    scaleX: 1,
+                    duration: this.autoSlideDelay / 1000,
+                    ease: 'none',
+                    onComplete: () => {
+                        // After delay, shrink bar to the right, then navigate
+                        gsap.set(this.progressBar, { transformOrigin: 'right' });
+                        this.progressTween = gsap.to(this.progressBar, {
+                            scaleX: 0,
+                            duration: 0.3,
+                            ease: 'power2.in',
+                            onComplete: () => {
+                                if (!this.isAnimating && this.mode === 'slider') {
+                                    this.navigate('next');
+                                }
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Fallback if no progress bar is found
+                this.progressTween = gsap.delayedCall(this.autoSlideDelay / 1000, () => {
+                    if (!this.isAnimating && this.mode === 'slider') {
+                        this.navigate('next');
+                    }
+                });
+            }
+        }
+    }
+
+    stopAutoSlide(resetVisually = true) {
+        if (this.progressTween) {
+            this.progressTween.kill();
+            this.progressTween = null;
+        }
+
+        if (resetVisually && this.progressBar) {
+            gsap.set(this.progressBar, { scaleX: 0, transformOrigin: 'left' });
+        }
+    }
 
     _getActiveImage(index) {
         const idx = index !== undefined ? index : this.currentIndex;
@@ -679,6 +786,7 @@ class HomeSlider {
     }
 
     destroy() {
+        this.stopAutoSlide();
         saveSliderState(this.currentIndex, this.mode, this._getActiveImage());
         this._stopCarouselTicker();
         this.prevBtn?.removeEventListener('click', this.onPrev);
