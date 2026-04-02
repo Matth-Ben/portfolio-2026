@@ -1,6 +1,6 @@
 /**
  * Text Split Animations
- * 
+ *
  * Splits text into characters, words, or lines and animates them using GSAP
  */
 import gsap from 'gsap';

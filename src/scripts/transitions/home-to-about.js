@@ -1,13 +1,11 @@
 import { cleanupScrollTriggers } from '../animations.js';
-import { scrollToTop, destroyLenis, initLenis } from '../lenis.js';
-import { initPageAnimations } from '../animations.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { animateHomeUIOut } from './utils.js';
 import gsap from 'gsap';
 
 /**
  * Transition: Home → About
- * Séquence: UI out → nav links out → sidebar shrink
+ * Séquence: UI out → nav links out → sidebar shrink → about content in
  */
 export default {
     name: 'home-to-about',
@@ -15,9 +13,10 @@ export default {
     to: { namespace: ['about'] },
 
     async leave(data) {
-        const navLinks = document.querySelectorAll('.transition-link');
-        const mainHome = document.querySelector('.mainHome');
-        const wrapperProjects = document.querySelector('.wrapperProjects');
+        const currentContainer = data.current.container;
+        const navLinks = currentContainer.querySelectorAll('.transition-link');
+        const mainHome = currentContainer.querySelector('.mainHome');
+        const wrapperProjects = currentContainer.querySelector('.wrapperProjects');
 
         cleanupScrollTriggers();
 
@@ -105,20 +104,13 @@ export default {
         // Step 1: Animate UI elements out (title, buttons, project info)
         await animateHomeUIOut({ duration: 0.4, stagger: 0.03 });
 
-        await gsap.to(document.querySelector('.progress-back'), {
-          scaleX: 0,
-          transformOrigin: 'right',
-          duration: 0.3,
-          ease: 'power2.out'
-        })
-
         // Step 2: Animate nav links out
         await gsap.to(navLinks, {
             opacity: 0,
             yPercent: 100,
             duration: 0.3,
             stagger: 0.1,
-            ease: 'power2.out'
+            ease: 'power2.in'
         });
 
         // Step 3: Shrink sidebar
@@ -127,38 +119,46 @@ export default {
             height: '90%',
             left: 'calc(100% - 11.8rem)',
             duration: 0.6,
-            ease: 'power2.out',
+            ease: 'power2.inOut',
             onComplete: () => {
                 ScrollTrigger.refresh();
             }
         });
     },
 
+    beforeEnter(data) {
+        // Hide About page content BEFORE it becomes visible to prevent flash
+        const nextContainer = data.next.container;
+
+        // Hide nav links
+        const navLinks = nextContainer.querySelectorAll('.transition-link');
+        gsap.set(navLinks, { opacity: 0, yPercent: 100 });
+    },
+
     async afterEnter(data) {
         console.log('✨ Page About chargée');
+
+        const nextContainer = data.next.container;
 
         // Update transition image from slider state
         const savedState = sessionStorage.getItem('homeSliderState');
         if (savedState) {
             const state = JSON.parse(savedState);
             if (state.image) {
-                const img = data.next.container.querySelector('#transition-image');
+                const img = nextContainer.querySelector('#transition-image');
                 if (img) img.src = state.image;
             }
         }
 
         // Step 1: Animate nav links in
-        const links = document.querySelectorAll('.transition-link');
-        gsap.fromTo(links,
-            { opacity: 0, yPercent: 100 },
-            {
-                opacity: 1,
-                yPercent: 0,
-                duration: 0.3,
-                stagger: 0.1,
-                ease: 'power2.out'
-            }
-        );
+        const links = nextContainer.querySelectorAll('.transition-link');
+        gsap.to(links, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.4,
+            stagger: 0.1,
+            ease: 'power2.out'
+        });
 
         // Step 2: Initialize text animations with a small delay for smooth sequencing
         await new Promise(resolve => setTimeout(resolve, 150));

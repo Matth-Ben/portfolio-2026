@@ -33,10 +33,12 @@ import "../styles/loader.css";
   <body class="bg-[#232323] text-[#EAE8DE] uppercase">
     <!-- Page loader overlay -->
     <div class="page-loader" id="page-loader"></div>
+    <div class="grain-overlay"></div>
+
     <div data-barba="wrapper">
       <!-- Container Barba pour le contenu des pages -->
       <main
-        class="relative min-h-screen"
+        class="absolute inset-0 min-h-screen"
         data-barba="container"
         data-barba-namespace={namespace}
       >
@@ -44,16 +46,14 @@ import "../styles/loader.css";
 
         <svg style="display:none;">
           <filter id="noiseFilter">
-            <feTurbulence 
-              type="fractalNoise" 
-              baseFrequency="0.4" 
-              numOctaves="1" 
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.4"
+              numOctaves="1"
               stitchTiles="stitch" />
             <feColorMatrix type="saturate" values="0"/>
           </filter>
         </svg>
-
-        <div class="grain-overlay"></div>
 
         <!-- Hidden data for state restoration -->
         <div

@@ -103,13 +103,6 @@ export default {
         // Step 1: Animate UI elements out (title, buttons, project info)
         await animateHomeUIOut({ duration: 0.4, stagger: 0.03 });
 
-        await gsap.to(document.querySelector('.progress-back'), {
-          scaleX: 0,
-          transformOrigin: 'left',
-          duration: 0.3,
-          ease: 'power2.out'
-        })
-
         // Step 2: Animate nav links out
         await gsap.to(navLinks, {
             opacity: 0,

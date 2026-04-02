@@ -32,7 +32,7 @@ export async function animateHomeUIOut(options = {}) {
         discoverBtn: document.querySelector('.discover-btn'),
         carouselBtns: document.querySelectorAll('.carousel-btn'),
         allProjectsBtn: document.querySelector('.all-projects-btn'),
-        progressBar: document.querySelector('.progress-bar'),
+        progressBar: document.querySelector('.progress-back'),
         navigationInfo: document.querySelector('#navigation-info')
     };
 
@@ -375,4 +375,92 @@ export async function scaleOverlay(overlay, direction = 'in') {
             ease: 'power2.inOut',
         });
     }
+}
+
+/**
+ * Cache instantanément le contenu de la page Home (appelé dans beforeEnter)
+ * Empêche le flash de contenu lors du swap Barba
+ * @param {HTMLElement} container - Le container de la nouvelle page Home
+ */
+export function hideHomeContentInstant(container) {
+    // Hide mainHome section (slider + UI)
+    const mainHome = container.querySelector('.mainHome');
+    if (mainHome) {
+        gsap.set(mainHome, { opacity: 0 });
+    }
+
+    // Hide navigation links
+    const navLinks = container.querySelectorAll('.transition-link');
+    gsap.set(navLinks, { opacity: 0, yPercent: 100 });
+
+    // Hide UI elements
+    const uiElements = container.querySelectorAll(
+        '.ts-title, .project-info, .discover-btn, .carousel-btn, .all-projects-btn'
+    );
+    gsap.set(uiElements, { opacity: 0, y: 20 });
+
+    // Hide progress bar
+    const progressBar = container.querySelector('.progress-bar');
+    if (progressBar) {
+        gsap.set(progressBar, { opacity: 0, scaleX: 0 });
+    }
+}
+
+/**
+ * Anime l'apparition du contenu de la page Home de manière fluide
+ * @param {HTMLElement} container - Le container de la page Home
+ * @returns {Promise}
+ */
+export async function animateHomeContentIn(container) {
+    const mainHome = container.querySelector('.mainHome');
+    const navLinks = container.querySelectorAll('.transition-link');
+    const uiElements = container.querySelectorAll(
+        '.ts-title, .project-info, .discover-btn, .carousel-btn, .all-projects-btn'
+    );
+    const progressBar = container.querySelector('.progress-bar');
+
+    // Timeline for coordinated animations
+    const tl = gsap.timeline();
+
+    // Step 1: Fade in the mainHome section (slider background)
+    if (mainHome) {
+        tl.to(mainHome, {
+            opacity: 1,
+            duration: 0.5,
+            ease: 'power2.out'
+        }, 0);
+    }
+
+    // Step 2: Animate nav links in (staggered)
+    if (navLinks.length > 0) {
+        tl.to(navLinks, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.4,
+            stagger: 0.1,
+            ease: 'power2.out'
+        }, 0.2);
+    }
+
+    // Step 3: Animate UI elements in (staggered)
+    if (uiElements.length > 0) {
+        tl.to(uiElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.05,
+            ease: 'power2.out'
+        }, 0.3);
+    }
+
+    // Step 4: Reset progress bar for auto-slide
+    if (progressBar) {
+        tl.set(progressBar, {
+            opacity: 1,
+            scaleX: 0,
+            transformOrigin: 'left'
+        }, 0.5);
+    }
+
+    await tl;
 }

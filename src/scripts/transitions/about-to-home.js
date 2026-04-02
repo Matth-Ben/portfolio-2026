@@ -4,12 +4,14 @@ import {
     animateSplitTextOut,
     animateFadeElementsOut,
     animateHomeUIIn,
+    hideHomeContentInstant,
+    animateHomeContentIn,
 } from './utils.js';
 import gsap from 'gsap';
 
 /**
  * Transition: About → Home
- * Séquence: textes out → nav links out → sidebar expand
+ * Séquence: textes out → nav links out → sidebar expand → home content in
  */
 export default {
     name: 'about-to-home',
@@ -18,8 +20,8 @@ export default {
 
     async leave(data) {
         const currentContainer = data.current.container;
-        const navLinks = document.querySelectorAll('.transition-link');
-        const transitionSection = document.querySelector('.transition-section');
+        const navLinks = currentContainer.querySelectorAll('.transition-link');
+        const transitionSection = currentContainer.querySelector('.transition-section');
 
         cleanupScrollTriggers();
 
@@ -35,7 +37,7 @@ export default {
             yPercent: 100,
             duration: 0.3,
             stagger: 0.1,
-            ease: 'power2.out'
+            ease: 'power2.in'
         });
 
         // Step 4: Expand sidebar back to fullscreen
@@ -44,38 +46,32 @@ export default {
             height: '100%',
             left: '0',
             duration: 0.6,
-            ease: 'power2.out',
+            ease: 'power2.inOut',
             onComplete: () => {
                 ScrollTrigger.refresh();
             }
         });
     },
 
+    beforeEnter(data) {
+        // Hide all Home content BEFORE it becomes visible to prevent flash
+        hideHomeContentInstant(data.next.container);
+    },
+
     async afterEnter(data) {
         console.log('✨ Page Home chargée');
 
-        // Step 1: Reinitialize HomeSlider (must be done before animating UI)
+        const nextContainer = data.next.container;
+
+        // Step 1: Reinitialize HomeSlider
         const HomeSliderModule = await import('../home-slider.js');
         const HomeSlider = HomeSliderModule.default;
         if (HomeSlider) {
             new HomeSlider();
         }
 
-        // Step 2: Animate nav links in
-        const links = document.querySelectorAll('.transition-link');
-        gsap.fromTo(links,
-            { opacity: 0, yPercent: 100 },
-            {
-                opacity: 1,
-                yPercent: 0,
-                duration: 0.3,
-                stagger: 0.1,
-                ease: 'power2.out'
-            }
-        );
-
-        // Step 3: Animate Home UI elements in with delay
-        await animateHomeUIIn({ delay: 0.2 });
+        // Step 2: Animate all Home content in smoothly
+        await animateHomeContentIn(nextContainer);
 
         initPageAnimations(true);
 
