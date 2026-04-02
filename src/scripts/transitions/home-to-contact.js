@@ -1,10 +1,11 @@
 import { cleanupScrollTriggers } from '../animations.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { animateHomeUIOut } from './utils.js';
 import gsap from 'gsap';
 
 /**
  * Transition: Home → Contact
- * Slide horizontal de gauche à droite avec gradient pink
+ * Séquence: UI out → nav links out → sidebar shrink (vers la gauche)
  */
 export default {
     name: 'home-to-contact',
@@ -20,22 +21,25 @@ export default {
 
         // Save the active slide image for the transition
         const savedState = sessionStorage.getItem('homeSliderState');
+        let activeIndex = 0;
+        let slide = null;
+
         if (savedState) {
             const state = JSON.parse(savedState);
-            // Get image from the active slide in the DOM
-            const activeIndex = state.index || 0;
-            const slide = wrapperProjects?.querySelectorAll('.slider-slide')[activeIndex];
+            activeIndex = state.index || 0;
+            slide = wrapperProjects?.querySelectorAll('.slider-slide')[activeIndex];
             const imgEl = slide?.querySelector('.slider-slide__mask img');
             if (imgEl) {
                 state.image = imgEl.getAttribute('src');
                 sessionStorage.setItem('homeSliderState', JSON.stringify(state));
             }
+
+            // Handle carousel mode collapse
             if (state.mode === 'carousel' && wrapperProjects) {
-                // Stop the carousel ticker
                 if (window.homeSliderInstance?._stopCarouselTicker) {
                     window.homeSliderInstance._stopCarouselTicker();
                 }
-                // Fade out + slide outward non-active carousel slides
+
                 const allSlides = wrapperProjects.querySelectorAll('.slider-slide');
                 const nonActive = Array.from(allSlides).filter((_, i) => i !== activeIndex);
 
@@ -43,9 +47,7 @@ export default {
                 const halfWidth = inst?.carouselTotalWidth / 2;
                 const wrapFn = gsap.utils.wrap(-halfWidth, halfWidth);
 
-                // Also fade out UI elements (buttons, project info)
-                const uiElements = document.querySelectorAll('.carousel-btn, .discover-btn, .all-projects-btn, .project-info, .project-counter');
-
+                // Slide out non-active carousel slides
                 const slideOutPromises = nonActive.map((s) => {
                     const i = Array.from(allSlides).indexOf(s);
                     const initialPos = i * inst.carouselSpacing;
@@ -60,18 +62,7 @@ export default {
                     });
                 });
 
-                // Fade out UI elements in parallel
-                slideOutPromises.push(
-                    gsap.to(uiElements, {
-                        opacity: 0,
-                        duration: 0.3,
-                        ease: 'power2.in',
-                    })
-                );
-
                 await Promise.all(slideOutPromises);
-
-                // Hide non-active slides
                 nonActive.forEach(s => gsap.set(s, { visibility: 'hidden' }));
 
                 // Expand active slide to fullscreen
@@ -89,7 +80,6 @@ export default {
                         overflow: 'hidden',
                     });
 
-                    // Reset mask
                     const mask = slide.querySelector('.slider-slide__mask');
                     const maskImg = mask?.querySelector('img');
                     gsap.set(mask, { xPercent: 0, position: 'relative', inset: 'auto', width: '100%', height: '100%' });
@@ -110,6 +100,17 @@ export default {
             }
         }
 
+        // Step 1: Animate UI elements out (title, buttons, project info)
+        await animateHomeUIOut({ duration: 0.4, stagger: 0.03 });
+
+        await gsap.to(document.querySelector('.progress-back'), {
+          scaleX: 0,
+          transformOrigin: 'left',
+          duration: 0.3,
+          ease: 'power2.out'
+        })
+
+        // Step 2: Animate nav links out
         await gsap.to(navLinks, {
             opacity: 0,
             yPercent: 100,
@@ -118,6 +119,7 @@ export default {
             ease: 'power2.out'
         });
 
+        // Step 3: Shrink sidebar (to the left)
         await gsap.to(mainHome, {
             width: '11.8rem',
             height: '90%',
@@ -143,26 +145,22 @@ export default {
             }
         }
 
+        // Step 1: Animate nav links in
         const links = document.querySelectorAll('.transition-link');
-
-        gsap.fromTo(links, {
-            opacity: 0,
-            yPercent: 100,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: 'power2.out'
-        }, {
-            opacity: 1,
-            yPercent: 0,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: 'power2.out',
-            onComplete: () => {
-                console.log('✨ Links appear');
+        gsap.fromTo(links,
+            { opacity: 0, yPercent: 100 },
+            {
+                opacity: 1,
+                yPercent: 0,
+                duration: 0.3,
+                stagger: 0.1,
+                ease: 'power2.out'
             }
-        })
+        );
 
-        // Réinitialiser les animations de texte pour la nouvelle page
+        // Step 2: Initialize text animations with a small delay for smooth sequencing
+        await new Promise(resolve => setTimeout(resolve, 150));
+
         const { initTextAnimations } = await import('../text-animations.js');
         initTextAnimations();
 

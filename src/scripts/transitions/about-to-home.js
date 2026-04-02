@@ -1,18 +1,15 @@
-import { cleanupScrollTriggers } from '../animations.js';
-import { scrollToTop, destroyLenis, initLenis } from '../lenis.js';
-import { initPageAnimations } from '../animations.js';
+import { cleanupScrollTriggers, initPageAnimations } from '../animations.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-    createOverlay,
-    removeOverlay,
-    fadeOutContent,
-    slideOverlay,
+    animateSplitTextOut,
+    animateFadeElementsOut,
+    animateHomeUIIn,
 } from './utils.js';
 import gsap from 'gsap';
 
 /**
  * Transition: About → Home
- * Slide horizontal de droite à gauche avec gradient green
+ * Séquence: textes out → nav links out → sidebar expand
  */
 export default {
     name: 'about-to-home',
@@ -23,18 +20,16 @@ export default {
         const currentContainer = data.current.container;
         const navLinks = document.querySelectorAll('.transition-link');
         const transitionSection = document.querySelector('.transition-section');
-        const elemsFadeIn = document.querySelectorAll('.fade-in');
 
         cleanupScrollTriggers();
 
-        await gsap.to(elemsFadeIn, {
-            opacity: 0,
-            yPercent: 100,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: 'power2.out'
-        });
+        // Step 1: Animate split text elements out (h1, skills, description)
+        await animateSplitTextOut(currentContainer, { duration: 0.4, stagger: 0.02 });
 
+        // Step 2: Animate fade-in elements out (if any remain)
+        await animateFadeElementsOut(currentContainer, { duration: 0.3 });
+
+        // Step 3: Animate nav links out
         await gsap.to(navLinks, {
             opacity: 0,
             yPercent: 100,
@@ -43,6 +38,7 @@ export default {
             ease: 'power2.out'
         });
 
+        // Step 4: Expand sidebar back to fullscreen
         await gsap.to(transitionSection, {
             width: '100%',
             height: '100%',
@@ -57,24 +53,29 @@ export default {
 
     async afterEnter(data) {
         console.log('✨ Page Home chargée');
-        const links = document.querySelectorAll('.transition-link');
 
-        gsap.fromTo(links, {
-            opacity: 0,
-            yPercent: 100,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: 'power2.out'
-        }, {
-            opacity: 1,
-            yPercent: 0,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: 'power2.out',
-            onComplete: () => {
-                console.log('✨ Links appear');
+        // Step 1: Reinitialize HomeSlider (must be done before animating UI)
+        const HomeSliderModule = await import('../home-slider.js');
+        const HomeSlider = HomeSliderModule.default;
+        if (HomeSlider) {
+            new HomeSlider();
+        }
+
+        // Step 2: Animate nav links in
+        const links = document.querySelectorAll('.transition-link');
+        gsap.fromTo(links,
+            { opacity: 0, yPercent: 100 },
+            {
+                opacity: 1,
+                yPercent: 0,
+                duration: 0.3,
+                stagger: 0.1,
+                ease: 'power2.out'
             }
-        })
+        );
+
+        // Step 3: Animate Home UI elements in with delay
+        await animateHomeUIIn({ delay: 0.2 });
 
         initPageAnimations(true);
 

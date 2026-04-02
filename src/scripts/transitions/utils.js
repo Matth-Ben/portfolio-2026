@@ -1,8 +1,228 @@
 import gsap from 'gsap';
+import { SplitText } from 'gsap/SplitText';
+
+// Register GSAP plugin
+gsap.registerPlugin(SplitText);
 
 /**
  * Utilitaires pour les transitions Barba.js
  */
+
+/**
+ * Anime la sortie des éléments UI de la page Home
+ * @param {Object} options - Options d'animation
+ * @returns {Promise}
+ */
+export async function animateHomeUIOut(options = {}) {
+    const {
+        duration = 0.4,
+        stagger = 0.05,
+        ease = 'power2.in'
+    } = options;
+
+    // Stop auto-slide and kill progress bar tweens from HomeSlider
+    if (window.homeSliderInstance) {
+        window.homeSliderInstance.stopAutoSlide();
+    }
+
+    const elements = {
+        title: document.querySelector('.mainHome .ts-title'),
+        projectInfo: document.querySelector('.project-info'),
+        projectCounter: document.querySelector('.project-counter'),
+        discoverBtn: document.querySelector('.discover-btn'),
+        carouselBtns: document.querySelectorAll('.carousel-btn'),
+        allProjectsBtn: document.querySelector('.all-projects-btn'),
+        progressBar: document.querySelector('.progress-bar'),
+        navigationInfo: document.querySelector('#navigation-info')
+    };
+
+    const allElements = [
+        elements.title,
+        elements.projectInfo,
+        elements.discoverBtn,
+        ...elements.carouselBtns,
+        elements.allProjectsBtn
+    ].filter(Boolean);
+
+    // Kill any running tweens on progress bar and animate it out
+    if (elements.progressBar) {
+        gsap.killTweensOf(elements.progressBar);
+        gsap.to(elements.progressBar, {
+            scaleX: 0,
+            opacity: 0,
+            duration: duration * 0.5,
+            ease
+        });
+    }
+
+    if (allElements.length === 0) return;
+
+    // Animate all UI elements out
+    await gsap.to(allElements, {
+        opacity: 0,
+        y: 20,
+        duration,
+        stagger,
+        ease
+    });
+}
+
+/**
+ * Anime l'entrée des éléments UI de la page Home
+ * @param {Object} options - Options d'animation
+ * @returns {Promise}
+ */
+export async function animateHomeUIIn(options = {}) {
+    const {
+        duration = 0.4,
+        stagger = 0.05,
+        ease = 'power2.out',
+        delay = 0
+    } = options;
+
+    const elements = {
+        title: document.querySelector('.mainHome .ts-title'),
+        projectInfo: document.querySelector('.project-info'),
+        projectCounter: document.querySelector('.project-counter'),
+        discoverBtn: document.querySelector('.discover-btn'),
+        carouselBtns: document.querySelectorAll('.carousel-btn'),
+        allProjectsBtn: document.querySelector('.all-projects-btn'),
+        progressBar: document.querySelector('.progress-bar')
+    };
+
+    const allElements = [
+        elements.title,
+        elements.projectInfo,
+        elements.discoverBtn,
+        ...elements.carouselBtns,
+        elements.allProjectsBtn
+    ].filter(Boolean);
+
+    if (allElements.length === 0) return;
+
+    // Reset and animate in
+    gsap.set(allElements, { opacity: 0, y: 20 });
+
+    await gsap.to(allElements, {
+        opacity: 1,
+        y: 0,
+        duration,
+        stagger,
+        delay,
+        ease
+    });
+
+    // Reset progress bar to initial state (HomeSlider will handle its animation)
+    if (elements.progressBar) {
+        gsap.set(elements.progressBar, {
+            opacity: 1,
+            scaleX: 0,
+            transformOrigin: 'left'
+        });
+    }
+}
+
+/**
+ * Anime la sortie des textes splitText d'une page
+ * @param {HTMLElement} container - Le container de la page
+ * @param {Object} options - Options d'animation
+ * @returns {Promise}
+ */
+export async function animateSplitTextOut(container, options = {}) {
+    const {
+        duration = 0.4,
+        stagger = 0.02,
+        ease = 'power2.in'
+    } = options;
+
+    // Find all elements with text-split that have been animated
+    const splitElements = container.querySelectorAll('[data-text-split].split-ready');
+
+    if (splitElements.length === 0) return;
+
+    const animations = [];
+
+    splitElements.forEach(element => {
+        const splitType = element.dataset.textSplit || 'chars';
+        const animation = element.dataset.textAnimation || 'fade';
+
+        // Create a new split for the animation out
+        const split = new SplitText(element, {
+            type: splitType,
+            linesClass: 'split-line',
+            wordsClass: 'split-word',
+            charsClass: 'split-char'
+        });
+
+        let targets;
+        switch (splitType) {
+            case 'lines':
+                targets = split.lines;
+                break;
+            case 'words':
+                targets = split.words;
+                break;
+            case 'chars':
+            default:
+                targets = split.chars;
+                break;
+        }
+
+        if (!targets || targets.length === 0) return;
+
+        // Determine animation out props (reverse of animation in)
+        const animProps = {
+            opacity: 0,
+            duration,
+            stagger,
+            ease
+        };
+
+        switch (animation) {
+            case 'slideUp':
+                animProps.y = -30;
+                break;
+            case 'slideDown':
+                animProps.y = 30;
+                break;
+            case 'scale':
+                animProps.scale = 0.8;
+                break;
+        }
+
+        animations.push(gsap.to(targets, animProps));
+    });
+
+    if (animations.length > 0) {
+        await Promise.all(animations);
+    }
+}
+
+/**
+ * Anime la sortie des éléments avec classe fade-in
+ * @param {HTMLElement} container - Le container de la page
+ * @param {Object} options - Options d'animation
+ * @returns {Promise}
+ */
+export async function animateFadeElementsOut(container, options = {}) {
+    const {
+        duration = 0.3,
+        stagger = 0.05,
+        ease = 'power2.in'
+    } = options;
+
+    const fadeElements = container.querySelectorAll('.fade-in');
+
+    if (fadeElements.length === 0) return;
+
+    await gsap.to(fadeElements, {
+        opacity: 0,
+        y: 20,
+        duration,
+        stagger,
+        ease
+    });
+}
 
 /**
  * Crée un overlay de transition

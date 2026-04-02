@@ -845,4 +845,9 @@ if (typeof document !== 'undefined') {
     });
 }
 
+// Expose HomeSlider class globally for Barba.js reinitialization
+if (typeof window !== 'undefined') {
+    window.HomeSlider = HomeSlider;
+}
+
 export default HomeSlider;
