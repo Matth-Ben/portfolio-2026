@@ -22,6 +22,7 @@ export default {
         const currentContainer = data.current.container;
         const navLinks = currentContainer.querySelectorAll('.transition-link');
         const transitionSection = currentContainer.querySelector('.transition-section');
+        const progress = currentContainer.querySelector('.progress-back');
 
         cleanupScrollTriggers();
 
@@ -39,6 +40,14 @@ export default {
             stagger: 0.1,
             ease: 'power2.in'
         });
+
+        await gsap.to(progress, {
+          scaleX: 0,
+          opacity: 0,
+          transformOrigin: 'right',
+          duration: 0.3,
+          ease: 'power2.in'
+        })
 
         // Step 4: Expand sidebar back to fullscreen
         await gsap.to(transitionSection, {

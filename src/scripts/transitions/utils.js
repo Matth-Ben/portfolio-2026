@@ -51,7 +51,7 @@ export async function animateHomeUIOut(options = {}) {
             scaleX: 0,
             opacity: 0,
             duration: duration * 0.5,
-            ease
+            ease: 'power2.in'
         });
     }
 

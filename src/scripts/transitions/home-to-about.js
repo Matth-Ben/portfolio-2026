@@ -115,9 +115,9 @@ export default {
 
         // Step 3: Shrink sidebar
         await gsap.to(mainHome, {
-            width: '11.8rem',
+            width: '7.8rem',
             height: '90%',
-            left: 'calc(100% - 11.8rem)',
+            left: 'calc(100% - 7.8rem)',
             duration: 0.6,
             ease: 'power2.inOut',
             onComplete: () => {
@@ -159,6 +159,18 @@ export default {
             stagger: 0.1,
             ease: 'power2.out'
         });
+
+        const progress = document.querySelectorAll('.progress-back');
+        gsap.fromTo(progress, {
+          scaleX: 0,
+          opacity: 0
+        }, {
+          scaleX: 1,
+          opacity: 1,
+          transformOrigin: 'right',
+          duration: 0.6,
+          ease: 'power2.out'
+        })
 
         // Step 2: Initialize text animations with a small delay for smooth sequencing
         await new Promise(resolve => setTimeout(resolve, 150));
