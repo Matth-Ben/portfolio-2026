@@ -1,0 +1,14 @@
+{
+  "title": "Maison de la musique de Nanterre",
+  "image": "/images/mmn/4c1f8b62082f71522a953fd320b98f507884257a_00e7ba5f85.png",
+  "description": "Theatrre de danse contemporaine",
+  "agency": {
+    "name": "Danka",
+    "url": "https://www.danka.fr"
+  },
+  "tags": ["Web development"],
+  "cover": {
+    "image": "/images/mmn/4c1f8b62082f71522a953fd320b98f507884257a_00e7ba5f85.png",
+    "title": "Le Transbordeur"
+  }
+}

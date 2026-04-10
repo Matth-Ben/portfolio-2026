@@ -1,0 +1,91 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import data from "../data/projects/sgh-data.json";
+---
+
+<MainLayout title="Projet : SGH - BENOIT Matthias" namespace="project-detail">
+    <!-- Hero Section (fixed pour le scroll géré par GSAP) -->
+    <section class="mainProject fixed z-10 w-full h-dvh top-0 left-0 overflow-hidden">
+      <nav
+        class="relative px-4 md:px-5 py-5"
+      >
+        <ul class="flex items-center justify-between w-full">
+          <li>
+            <a class="ts-little transition-link block" href="/about" data-barba
+              >About</a
+            >
+          </li>
+          <li>
+            <a class="ts-little transition-link back-link block" href="/" data-barba
+              >Back</a
+            >
+          </li>
+          <li>
+            <a class="ts-little transition-link block" href="/contact" data-barba
+              >Contact</a
+            >
+          </li>
+        </ul>
+      </nav>
+
+      <div
+        id="navigation-info"
+        class="relative px-4 md:px-5"
+      >
+        <div class="relative">
+          <div class="progress-back relative w-full h-[1px] bg-[#EAE8DE] opacity-30"></div>
+          <!-- progress-project : panneau de contenu qui défile au scroll -->
+          <div class="progress-project absolute top-0 left-0 w-full overflow-hidden bg-[#EAE8DE]" style="height: calc(100dvh - 56px)">
+            <div class="project-content-inner text-[#3D3D3D]">
+              <!-- Contenu du projet ici -->
+              <div class="px-5 py-4">
+                <!-- Entête du projet -->
+                <div class="grid grid-cols-8 md:grid-cols-12 gap-4">
+                <div class="col-span-8 md:col-span-8">
+                <h1 class="ts-big">{data.title}</h1>
+                </div>
+                <div class="col-span-8 md:col-span-4 text-right ts-little">
+                    <a href={data.agency.url} target="_blank">with {data.agency.name}</a>
+                    <ul class="">
+                        {data.tags.map((tag, index) => (
+                            <li key={index}>{tag}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div class="col-span-8 md:col-span-12 mt-40 ts-little">
+                <div class="flex items-center justify-between">
+                    <div class="">{data.description}</div>
+                    <div class="">Scroll</div>
+                </div>
+                </div>
+                </div>
+                <!-- Cover du projet -->
+                <div class="aspect-video mt-5">
+                    <img
+                        src={data.cover.image}
+                        alt={data.cover.title}
+                        class="w-full h-full object-cover"
+                    />
+                </div>
+                <!-- Content du projet -->
+                <div class="mt-5">
+                    <div class=""></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="project-bg fixed inset-0 z-0">
+        <div class="project-bg__mask absolute inset-0 w-full h-full overflow-hidden">
+            <img
+                src={data.image}
+                alt={data.title}
+                class="w-full h-full object-cover"
+            />
+            <div class="project-bg__overlay absolute inset-0 w-full h-full bg-[#00000066]" />
+        </div>
+    </div>
+</MainLayout>
