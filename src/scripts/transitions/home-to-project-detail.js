@@ -55,6 +55,16 @@ export default {
             if (activeImg)  gsap.set(activeImg,  { xPercent: 0 });
         }
 
+        // Assombrit l'overlay du slide actif sur la home
+        const activeSlideOverlay = slider?.slides[slider.currentIndex]?.querySelector('.slider-slide__overlay');
+        if (activeSlideOverlay) {
+            gsap.to(activeSlideOverlay, {
+                backgroundColor: '#00000066',
+                duration: 0.3,
+                ease: 'power2.out',
+            });
+        }
+
         // progressBar se remplit en premier
         if (progressBar) {
             gsap.killTweensOf(progressBar);
@@ -115,7 +125,7 @@ export default {
     beforeEnter(data) {
         // Cache le nouveau container IMMÉDIATEMENT à l'insertion pour éviter tout flash
         const container = data.next.container;
-        gsap.set(container, { opacity: 0, visibility: 'visible' });
+        gsap.set(container, { visibility: 'hidden' });
 
         // Pré-positionne mainProject à 50vh pour les pages avec scroll projet
         const mainProject = container.querySelector('.mainProject');
@@ -123,12 +133,7 @@ export default {
             gsap.set(mainProject, { y: window.innerHeight * 0.5 - 52 });
         }
 
-        // Cache l'image de fond de la page projet (elle sera révélée plus tard si besoin)
-        const projectBg = container.querySelector('.project-bg');
-        if (projectBg) gsap.set(projectBg, { opacity: 1 });
-
-        // DEBUG: les 2 containers sont présents ici — on rend le nouveau visible et on pause
-        gsap.set(container, { opacity: 1 });
+        gsap.set(container, { visibility: 'visible' });
         gsap.globalTimeline.resume()
     },
 
@@ -147,6 +152,16 @@ export default {
             ease: 'power2.out',
             onComplete: () => ScrollTrigger.refresh(),
         });
+
+        // Assombrit l'overlay de project-bg
+        const projectBgOverlay = container.querySelector('.project-bg__overlay');
+        if (projectBgOverlay) {
+            gsap.to(projectBgOverlay, {
+                backgroundColor: '#00000066',
+                duration: 0.6,
+                ease: 'power2.out',
+            });
+        }
 
         if (overlay) {
             await gsap.to(overlay, {
