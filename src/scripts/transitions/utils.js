@@ -378,6 +378,62 @@ export async function scaleOverlay(overlay, direction = 'in') {
 }
 
 /**
+ * Cache instantanément UNIQUEMENT le slider et les éléments de navigation-info,
+ * sans toucher aux transition-link ni au progress-back.
+ * Utilisé pour la transition Project Detail → Home (les nav links restent visibles).
+ * @param {HTMLElement} container
+ */
+export function hideHomeNavInfoInstant(container) {
+    const mainHome = container.querySelector('.mainHome');
+    if (mainHome) gsap.set(mainHome, { opacity: 0 });
+
+    const uiElements = container.querySelectorAll(
+        '.ts-title, .project-info, .discover-btn, .carousel-btn, .all-projects-btn'
+    );
+    gsap.set(uiElements, { opacity: 0, y: 20 });
+
+    const progressBar = container.querySelector('.progress-bar');
+    if (progressBar) gsap.set(progressBar, { opacity: 0, scaleX: 0 });
+}
+
+/**
+ * Anime l'entrée du slider et des éléments de navigation-info uniquement,
+ * sans toucher aux transition-link (ils sont déjà visibles).
+ * Utilisé pour la transition Project Detail → Home.
+ * @param {HTMLElement} container
+ * @returns {Promise}
+ */
+export async function animateHomeNavInfoIn(container) {
+    const mainHome = container.querySelector('.mainHome');
+    const uiElements = container.querySelectorAll(
+        '.ts-title, .project-info, .discover-btn, .carousel-btn, .all-projects-btn'
+    );
+    const progressBar = container.querySelector('.progress-bar');
+
+    const tl = gsap.timeline();
+
+    if (mainHome) {
+        tl.to(mainHome, { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0);
+    }
+
+    if (uiElements.length > 0) {
+        tl.to(uiElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            stagger: 0.05,
+            ease: 'power2.out',
+        }, 0.1);
+    }
+
+    if (progressBar) {
+        tl.set(progressBar, { opacity: 1, scaleX: 0, transformOrigin: 'left' }, 0.5);
+    }
+
+    await tl;
+}
+
+/**
  * Cache instantanément le contenu de la page Home (appelé dans beforeEnter)
  * Empêche le flash de contenu lors du swap Barba
  * @param {HTMLElement} container - Le container de la nouvelle page Home

@@ -9,6 +9,13 @@
 html {
     /* Lenis gère le scroll, donc on désactive le scroll natif */
     overflow-x: hidden;
+    scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
 }
 
 html.lenis,

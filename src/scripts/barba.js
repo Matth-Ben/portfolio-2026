@@ -1,4 +1,5 @@
 import barba from '@barba/core';
+import gsap from 'gsap';
 
 // Import custom transitions
 import homeToAbout from './transitions/home-to-about.js';
@@ -9,6 +10,7 @@ import homeToProjects from './transitions/home-to-projects.js';
 import projectsToHome from './transitions/projects-to-home.js';
 import homeToProjectDetail from './transitions/home-to-project-detail.js';
 import projectDetailToHome from './transitions/project-detail-to-home.js';
+import { initProjectScroll } from './project.js';
 
 // Import initialization functions
 import { initPageAnimations, cleanupScrollTriggers } from './animations.js';
@@ -100,8 +102,12 @@ export function initBarba() {
             },
             {
                 namespace: 'project-detail',
-                afterEnter() {
-                    console.log('📁 Project detail page loaded');
+                afterEnter(data) {
+                    // Initialise le scroll à deux phases pour les pages projet qui le supportent
+                    const container = data.next?.container ?? document.querySelector('[data-barba-namespace="project-detail"]')?.closest('[data-barba="container"]');
+                    if (container?.querySelector('.project-content-inner')) {
+                        initProjectScroll();
+                    }
                 },
             },
         ],
@@ -111,6 +117,21 @@ export function initBarba() {
                 // Cleanup before transition
                 cleanupScrollTriggers();
                 cleanupTextAnimations();
+            },
+            beforeEnter(data) {
+                // New container always renders on top of the old one
+                if (data?.next?.container) {
+                    gsap.set(data.next.container, { zIndex: 51, position: 'relative' });
+                }
+                if (data?.current?.container) {
+                    gsap.set(data.current.container, { zIndex: 50, position: 'relative' });
+                }
+            },
+            after(data) {
+                // Reset z-index after transition completes
+                if (data?.next?.container) {
+                    gsap.set(data.next.container, { zIndex: 'auto', position: 'relative' });
+                }
             },
             afterEnter() {
                 // Refresh debugger after page transition

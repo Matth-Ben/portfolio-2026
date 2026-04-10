@@ -796,7 +796,7 @@ class HomeSlider {
         }
 
         if (this.discoverBtn) {
-            this.discoverBtn.href = `/projects/${project.slug}`;
+            this.discoverBtn.href = `/${project.slug}`;
         }
     }
 

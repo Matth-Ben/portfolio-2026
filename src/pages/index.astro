@@ -32,10 +32,11 @@ import homeData from "../data/home-data.json";
       <div class="relative">
         <div class="progress-back relative w-full h-[1px] bg-[#EAE8DE] opacity-30"></div>
         <div
-          class="progress-bar absolute top-0 left-0 h-full bg-white w-full translate-y-1/2"
+          class="progress-bar absolute top-0 left-0 h-full bg-[#EAE8DE] w-full translate-y-1/2"
           style="transform: scaleX(0); transform-origin: left;"
         >
         </div>
+        <div class="progress-project absolute top-0 left-0 h-0 px-4 md:px-5 bg-[#EAE8DE] w-full"></div>
       </div>
       <div class="grid grid-cols-8 md:grid-cols-12 gap max-md:h-full pt-5">
         <div
@@ -66,7 +67,7 @@ import homeData from "../data/home-data.json";
             {
               homeData.projects[0].slug && (
                 <a
-                  href={`/projects/${homeData.projects[0].slug}`}
+                  href={`/${homeData.projects[0].slug}`}
                   class="discover-btn flex items-center gap-2"
                 >
                   <svg
