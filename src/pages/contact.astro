@@ -83,7 +83,7 @@ import contactData from "../data/contact-data.json";
 </MainLayout>
 
 <script>
-  // Update transition image from slider state
+  // Update transition image and back link from slider state
   const saved = sessionStorage.getItem("homeSliderState");
   if (saved) {
     const state = JSON.parse(saved);
@@ -92,6 +92,13 @@ import contactData from "../data/contact-data.json";
         "transition-image",
       ) as HTMLImageElement | null;
       if (img) img.src = state.image;
+    }
+    // Si on vient d'un projet, le lien "Back" pointe vers ce projet
+    if (state.projectUrl) {
+      const backLink = document.querySelector(
+        ".transition-link[href='/']",
+      ) as HTMLAnchorElement | null;
+      if (backLink) backLink.href = state.projectUrl;
     }
   }
 </script>

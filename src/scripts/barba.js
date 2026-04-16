@@ -10,6 +10,10 @@ import homeToProjects from './transitions/home-to-projects.js';
 import projectsToHome from './transitions/projects-to-home.js';
 import homeToProjectDetail from './transitions/home-to-project-detail.js';
 import projectDetailToHome from './transitions/project-detail-to-home.js';
+import projectDetailToAbout from './transitions/project-detail-to-about.js';
+import projectDetailToContact from './transitions/project-detail-to-contact.js';
+import aboutToProjectDetail from './transitions/about-to-project-detail.js';
+import contactToProjectDetail from './transitions/contact-to-project-detail.js';
 import { initProjectScroll } from './project.js';
 
 // Import initialization functions
@@ -62,6 +66,10 @@ export function initBarba() {
             projectsToHome,
             homeToProjectDetail,
             projectDetailToHome,
+            projectDetailToAbout,
+            projectDetailToContact,
+            aboutToProjectDetail,
+            contactToProjectDetail,
         ],
 
         // Views spécifiques par namespace
