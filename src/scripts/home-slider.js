@@ -19,13 +19,14 @@ function getSliderState() {
  * - "carousel": infinite carousel with progress-based positioning (like projects page)
  */
 class HomeSlider {
-    constructor() {
+    constructor(options = {}) {
         // Strict singleton enforcement: if an instance already exists, destroy it.
         if (typeof window !== 'undefined' && window.homeSliderInstance) {
             window.homeSliderInstance.destroy();
         }
 
         this.id = Math.random().toString(36).substr(2, 5);
+        this.autoStart = options.autoStart !== false; // Par défaut true, sauf si explicitement false
 
         if (typeof window !== 'undefined') {
             window.homeSliderInstance = this;
@@ -114,7 +115,16 @@ class HomeSlider {
         // If saved state was carousel, restore it immediately
         if (this.mode === 'carousel') {
             this._applyCarouselModeInstant();
-        } else {
+        } else if (this.autoStart) {
+            this.startAutoSlide();
+        }
+    }
+
+    /**
+     * Démarre le slider manuellement (appelé après l'animation d'entrée)
+     */
+    start() {
+        if (this.mode === 'slider') {
             this.startAutoSlide();
         }
     }
@@ -829,7 +839,10 @@ class HomeSlider {
 // ---------------------------------------------------------
 
 const init = () => {
-    new HomeSlider();
+    // Si le loader est présent (premier chargement), ne pas démarrer automatiquement
+    // Le slider sera démarré manuellement après l'animation d'entrée
+    const hasLoader = document.getElementById('page-loader') !== null;
+    new HomeSlider({ autoStart: !hasLoader });
 };
 
 if (document.readyState === 'loading') {
